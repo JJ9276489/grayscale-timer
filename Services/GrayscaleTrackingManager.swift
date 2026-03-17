@@ -8,6 +8,7 @@ import WidgetKit
 final class GrayscaleTrackingManager: ObservableObject {
     @Published private(set) var isGrayscaleEnabled = false
     @Published private(set) var activeRun: RunRecord?
+    @Published private(set) var currentOffStartTime: Date?
 
     let calendar: Calendar
 
@@ -15,9 +16,11 @@ final class GrayscaleTrackingManager: ObservableObject {
     private let userDefaults: UserDefaults
     private var grayscaleObserver: NSObjectProtocol?
     private var checkpointTimer: Timer?
+    private var pendingBreakTimer: Timer?
 
     private enum DefaultsKey {
         static let lastVerifiedOnTimestamp = "grayscale_last_verified_on_timestamp"
+        static let currentOffTimestamp = "grayscale_current_off_timestamp"
     }
 
     init(modelContext: ModelContext, calendar: Calendar = .autoupdatingCurrent) {
@@ -59,6 +62,7 @@ final class GrayscaleTrackingManager: ObservableObject {
 
     private func recoverStateOnLaunch() {
         activeRun = try? fetchActiveRun()
+        currentOffStartTime = restoredOffStartTime()
         refreshFromSystem()
     }
 
@@ -69,14 +73,17 @@ final class GrayscaleTrackingManager: ObservableObject {
         isGrayscaleEnabled = currentState
 
         if currentState {
+            clearOffState()
             if activeRun == nil {
                 beginVerifiedRun(at: now)
             } else {
                 persistVerificationCheckpoint(at: now)
             }
         } else if let activeRun {
-            let recoveredEnd = recoveredEndDate(for: activeRun, fallback: now)
-            endVerifiedRun(at: recoveredEnd)
+            handlePendingBreak(for: activeRun, fallback: now)
+        } else if currentOffStartTime == nil {
+            currentOffStartTime = (try? fetchLatestBreakDate()) ?? currentOffStartTime
+            persistOffStartTimeIfNeeded()
         }
 
         updateCheckpointTimer()
@@ -107,6 +114,44 @@ final class GrayscaleTrackingManager: ObservableObject {
         saveContextIfNeeded()
     }
 
+    private func handlePendingBreak(for activeRun: RunRecord, fallback: Date) {
+        let offStart = currentOffStartTime ?? recoveredEndDate(for: activeRun, fallback: fallback)
+        currentOffStartTime = offStart
+        persistOffStartTimeIfNeeded()
+
+        let debounceSeconds = GoalSettingsStore.load(userDefaults: userDefaults).breakDebounceSeconds
+
+        if debounceSeconds <= 0 {
+            finalizeBreak(at: offStart)
+            return
+        }
+
+        schedulePendingBreak(at: offStart, debounceSeconds: debounceSeconds)
+    }
+
+    private func schedulePendingBreak(at offStart: Date, debounceSeconds: TimeInterval) {
+        pendingBreakTimer?.invalidate()
+
+        let remainingInterval = max(0, offStart.addingTimeInterval(debounceSeconds).timeIntervalSinceNow)
+
+        pendingBreakTimer = Timer.scheduledTimer(withTimeInterval: remainingInterval, repeats: false) { [weak self] _ in
+            Task { @MainActor in
+                guard let self else { return }
+                guard !UIAccessibility.isGrayscaleEnabled else { return }
+                self.finalizeBreak(at: offStart)
+                self.publishWidgetSnapshot(referenceDate: .now)
+            }
+        }
+
+        pendingBreakTimer?.tolerance = min(5, debounceSeconds / 3)
+    }
+
+    private func finalizeBreak(at offStart: Date) {
+        pendingBreakTimer?.invalidate()
+        pendingBreakTimer = nil
+        endVerifiedRun(at: offStart)
+    }
+
     private func rebuildSummaries(for days: Set<Date>) {
         guard !days.isEmpty else { return }
 
@@ -114,6 +159,7 @@ final class GrayscaleTrackingManager: ObservableObject {
         let completedRuns = allRuns.filter { !$0.isActive && $0.endTime != nil }
         let existingSummaries = (try? fetchAllSummaries()) ?? []
         var existingByDate = Dictionary(uniqueKeysWithValues: existingSummaries.map { ($0.date, $0) })
+        let goalSettings = GoalSettingsStore.load(userDefaults: userDefaults)
 
         for day in days {
             let snapshot = MetricsService.daySnapshot(
@@ -121,7 +167,8 @@ final class GrayscaleTrackingManager: ObservableObject {
                 runs: completedRuns,
                 calendar: calendar,
                 now: .now,
-                includeActive: false
+                includeActive: false,
+                goalSettings: goalSettings
             )
 
             if snapshot.totalVerifiedSeconds <= 0, snapshot.breakCount == 0, snapshot.longestRunSeconds <= 0 {
@@ -136,8 +183,8 @@ final class GrayscaleTrackingManager: ObservableObject {
             summary.totalVerifiedSeconds = snapshot.totalVerifiedSeconds
             summary.breakCount = snapshot.breakCount
             summary.longestRunSeconds = snapshot.longestRunSeconds
-            summary.qualified = snapshot.qualified
-            summary.perfect = snapshot.perfect
+            summary.qualified = snapshot.isQualifying
+            summary.perfect = snapshot.isPerfect
 
             if existingByDate[day] == nil {
                 modelContext.insert(summary)
@@ -148,17 +195,19 @@ final class GrayscaleTrackingManager: ObservableObject {
     private func publishWidgetSnapshot(referenceDate: Date) {
         let runs = (try? fetchAllRuns()) ?? []
         let summaries = (try? fetchAllSummaries()) ?? []
+        let goalSettings = GoalSettingsStore.load(userDefaults: userDefaults)
         let mergedSnapshots = MetricsService.mergedDaySnapshots(
             summaries: summaries,
             runs: runs,
             calendar: calendar,
-            now: referenceDate
+            now: referenceDate,
+            goalSettings: goalSettings
         )
 
         let snapshot = WidgetSnapshot(
             isActive: isGrayscaleEnabled && activeRun != nil,
             activeRunStartTime: activeRun?.startTime,
-            currentStreak: MetricsService.currentStreak(from: mergedSnapshots, calendar: calendar, today: referenceDate),
+            currentStreak: MetricsService.currentQualifyingStreak(from: mergedSnapshots, calendar: calendar, today: referenceDate),
             lastUpdated: referenceDate
         )
 
@@ -190,6 +239,29 @@ final class GrayscaleTrackingManager: ObservableObject {
         userDefaults.set(date.timeIntervalSinceReferenceDate, forKey: DefaultsKey.lastVerifiedOnTimestamp)
     }
 
+    private func persistOffStartTimeIfNeeded() {
+        if let currentOffStartTime {
+            userDefaults.set(currentOffStartTime.timeIntervalSinceReferenceDate, forKey: DefaultsKey.currentOffTimestamp)
+        } else {
+            userDefaults.removeObject(forKey: DefaultsKey.currentOffTimestamp)
+        }
+    }
+
+    private func restoredOffStartTime() -> Date? {
+        guard let interval = userDefaults.object(forKey: DefaultsKey.currentOffTimestamp) as? Double else {
+            return nil
+        }
+
+        return Date(timeIntervalSinceReferenceDate: interval)
+    }
+
+    private func clearOffState() {
+        pendingBreakTimer?.invalidate()
+        pendingBreakTimer = nil
+        currentOffStartTime = nil
+        userDefaults.removeObject(forKey: DefaultsKey.currentOffTimestamp)
+    }
+
     private func recoveredEndDate(for run: RunRecord, fallback: Date) -> Date {
         guard let interval = userDefaults.object(forKey: DefaultsKey.lastVerifiedOnTimestamp) as? Double else {
             return fallback
@@ -215,6 +287,12 @@ final class GrayscaleTrackingManager: ObservableObject {
         return try modelContext.fetch(descriptor)
     }
 
+    private func fetchLatestBreakDate() throws -> Date? {
+        try fetchAllRuns()
+            .compactMap(\.endTime)
+            .max()
+    }
+
     private func fetchAllSummaries() throws -> [DaySummary] {
         let descriptor = FetchDescriptor<DaySummary>(
             sortBy: [SortDescriptor(\DaySummary.date, order: .forward)]
@@ -227,3 +305,20 @@ final class GrayscaleTrackingManager: ObservableObject {
         try? modelContext.save()
     }
 }
+
+#if DEBUG
+extension GrayscaleTrackingManager {
+    static func preview(
+        modelContext: ModelContext,
+        isGrayscaleEnabled: Bool,
+        activeRun: RunRecord?,
+        currentOffStartTime: Date? = nil
+    ) -> GrayscaleTrackingManager {
+        let manager = GrayscaleTrackingManager(modelContext: modelContext)
+        manager.isGrayscaleEnabled = isGrayscaleEnabled
+        manager.activeRun = activeRun
+        manager.currentOffStartTime = currentOffStartTime
+        return manager
+    }
+}
+#endif

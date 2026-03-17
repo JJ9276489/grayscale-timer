@@ -13,9 +13,11 @@
 		42BDE437C2CE62DC22E0B4FB /* GrayscaleTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8197F44FAB13F214FD3272 /* GrayscaleTrackingManager.swift */; };
 		443E85F4556B1D1BF36332F8 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9268BF48C2D62A3628BDD45 /* PersistenceController.swift */; };
 		466BBD9FFF7FCE530A08F13B /* WidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBFDDF69956D21982B73EB9 /* WidgetSnapshot.swift */; };
+		5D99A0FF3E214C80A1671B7B /* GoalSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0198FD14BD5F424364522876 /* GoalSettings.swift */; };
 		63A89C76DF76A4C00C0FDEF4 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B14D3FA8674ED18B8854AEB5 /* HistoryView.swift */; };
 		6C6143989E83E39DF9226796 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17F1D8AE6DA4ACBEC025FFA /* DurationFormatter.swift */; };
 		8145EE202E8D48D97D781F62 /* MonochromeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98972233D135D5F41A9A4FA4 /* MonochromeTheme.swift */; };
+		871C1791064439A26D10A603 /* GoalSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0198FD14BD5F424364522876 /* GoalSettings.swift */; };
 		8A1C518836C52CC4365AB51B /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BDF06BB26D2453B1182B2F8 /* AppConfig.swift */; };
 		8BFD543DBDC200CBC43D1DE6 /* Grayscale Timer Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = CD7D11DE8642954CBC7F4F8E /* Grayscale Timer Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		900D2F7AD0E1C8C794E7A572 /* HeatmapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB77E48167AA977F8FE766D5 /* HeatmapView.swift */; };
@@ -56,6 +58,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0198FD14BD5F424364522876 /* GoalSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalSettings.swift; sourceTree = "<group>"; };
 		16FC597499BBD74E97B9077D /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
 		346AFF8730091C2DEA2A5BED /* MetricsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsService.swift; sourceTree = "<group>"; };
 		435E3DBA0F26F49462664E5B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -185,6 +188,7 @@
 			children = (
 				7BDF06BB26D2453B1182B2F8 /* AppConfig.swift */,
 				D17F1D8AE6DA4ACBEC025FFA /* DurationFormatter.swift */,
+				0198FD14BD5F424364522876 /* GoalSettings.swift */,
 				98972233D135D5F41A9A4FA4 /* MonochromeTheme.swift */,
 				6BBFDDF69956D21982B73EB9 /* WidgetSnapshot.swift */,
 			);
@@ -265,6 +269,7 @@
 			files = (
 				8A1C518836C52CC4365AB51B /* AppConfig.swift in Sources */,
 				E40DC404E52173BEF9BD7248 /* DurationFormatter.swift in Sources */,
+				5D99A0FF3E214C80A1671B7B /* GoalSettings.swift in Sources */,
 				D086A65364174B71E8590B2A /* GrayscaleTimerApp.swift in Sources */,
 				42BDE437C2CE62DC22E0B4FB /* GrayscaleTrackingManager.swift in Sources */,
 				900D2F7AD0E1C8C794E7A572 /* HeatmapView.swift in Sources */,
@@ -288,6 +293,7 @@
 			files = (
 				A7CA989C382EF3201C837E19 /* AppConfig.swift in Sources */,
 				6C6143989E83E39DF9226796 /* DurationFormatter.swift in Sources */,
+				871C1791064439A26D10A603 /* GoalSettings.swift in Sources */,
 				B3B376957E6410435CA5B871 /* GrayscaleTimerWidget.swift in Sources */,
 				8145EE202E8D48D97D781F62 /* MonochromeTheme.swift in Sources */,
 				466BBD9FFF7FCE530A08F13B /* WidgetSnapshot.swift in Sources */,

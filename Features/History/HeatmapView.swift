@@ -67,9 +67,9 @@ struct HeatmapView: View {
     @ViewBuilder
     private func dayCell(for day: HeatmapDay) -> some View {
         let isSelected = selectedDate.map { calendar.isDate($0, inSameDayAs: day.date) } ?? false
-        let fillOpacity = 0.06 + (min(day.intensity, 1) * 0.88)
+        let fillOpacity = 0.04 + (min(day.intensity, 1) * 0.9)
         let borderColor: Color = {
-            if day.snapshot.perfect {
+            if day.snapshot.isPerfect {
                 return .white
             }
 
@@ -84,13 +84,38 @@ struct HeatmapView: View {
             .fill(Color.white.opacity(fillOpacity))
             .overlay(
                 RoundedRectangle(cornerRadius: max(3, cellSize * 0.24), style: .continuous)
-                    .stroke(borderColor, lineWidth: (day.snapshot.perfect || isSelected) ? 1.15 : 0)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.14),
+                                .clear
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .opacity(0.45)
             )
+            .overlay(
+                RoundedRectangle(cornerRadius: max(3, cellSize * 0.24), style: .continuous)
+                    .stroke(borderColor, lineWidth: (day.snapshot.isPerfect || isSelected) ? 1.15 : 0)
+            )
+            .overlay(alignment: .bottomTrailing) {
+                if day.snapshot.breakCount > 0 {
+                    Circle()
+                        .fill(Color.black.opacity(0.68))
+                        .frame(width: max(2.5, cellSize * 0.22), height: max(2.5, cellSize * 0.22))
+                        .padding(1.5)
+                }
+            }
             .frame(width: cellSize, height: cellSize)
+            .shadow(color: .black.opacity(isSelected ? 0.32 : 0.14), radius: isSelected ? 8 : 4, x: 0, y: isSelected ? 4 : 2)
 
         if interactive {
             Button {
-                selectedDate = day.date
+                withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
+                    selectedDate = day.date
+                }
             } label: {
                 cell
             }

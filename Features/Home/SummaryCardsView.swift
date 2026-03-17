@@ -2,88 +2,124 @@ import SwiftUI
 
 struct SummaryCardsView: View {
     let todaySnapshot: DayMetricsSnapshot
-    let currentStreak: Int
-    let bestStreak: Int
-    let bestRunSeconds: Double
-    let qualifyingDays: Int
-    let perfectDays: Int
-    let heatmapDays: [HeatmapDay]
+    let todayStatus: TodayStatusSummary
+    let currentQualifyingStreak: Int
+    let bestQualifyingStreak: Int
+    let bestDaySeconds: Double
+    let sevenDayAverageRate: Double
 
     var body: some View {
-        VStack(spacing: 16) {
-            SummaryCard(title: "Today") {
-                HStack(spacing: 14) {
-                    MetricBlock(title: "Verified Today", value: DurationFormatter.statString(seconds: todaySnapshot.totalVerifiedSeconds))
-                    Divider()
-                        .overlay(Color.white.opacity(0.1))
-                    MetricBlock(title: "Breaks Today", value: "\(todaySnapshot.breakCount)")
-                }
-            }
+        VStack(spacing: 18) {
+            TodaySurface(
+                grayRateText: percentString(todaySnapshot.grayRate),
+                verifiedText: DurationFormatter.statString(seconds: todaySnapshot.totalVerifiedSeconds),
+                breaksText: "\(todaySnapshot.breakCount)",
+                relapseText: DurationFormatter.statString(seconds: todaySnapshot.relapseSeconds),
+                statusTitle: todayStatus.title,
+                statusDetail: todayStatus.detail
+            )
 
-            SummaryCard(title: "Streaks") {
-                HStack(spacing: 14) {
-                    MetricBlock(title: "Current Streak", value: "\(currentStreak)")
-                    Divider()
-                        .overlay(Color.white.opacity(0.1))
-                    MetricBlock(title: "Best Streak", value: "\(bestStreak)")
-                }
-            }
-
-            SummaryCard(title: "Records") {
-                HStack(alignment: .top, spacing: 14) {
-                    MetricBlock(title: "Best Run", value: DurationFormatter.statString(seconds: bestRunSeconds))
-                    Divider()
-                        .overlay(Color.white.opacity(0.1))
-                    MetricBlock(title: "Qualifying Days", value: "\(qualifyingDays)")
-                    Divider()
-                        .overlay(Color.white.opacity(0.1))
-                    MetricBlock(title: "Perfect Days", value: "\(perfectDays)")
-                }
-            }
-
-            SummaryCard(title: "Heatmap") {
-                VStack(alignment: .leading, spacing: 14) {
-                    HeatmapView(
-                        days: heatmapDays,
-                        selectedDate: .constant(nil),
-                        cellSize: 10,
-                        spacing: 4,
-                        interactive: false
-                    )
-
-                    Text("Last 28 days. Brighter cells mean more verified grayscale time.")
-                        .font(.system(size: 12, weight: .medium, design: .serif))
-                        .foregroundStyle(MonochromeTheme.tertiaryText)
-                }
-            }
+            ProgressionSurface(
+                currentStreak: "\(currentQualifyingStreak)",
+                bestStreak: "\(bestQualifyingStreak)",
+                bestDay: DurationFormatter.statString(seconds: bestDaySeconds),
+                sevenDayAverage: percentString(sevenDayAverageRate)
+            )
         }
+    }
+
+    private func percentString(_ value: Double) -> String {
+        "\(Int((value * 100).rounded()))%"
     }
 }
 
-private struct SummaryCard<Content: View>: View {
-    let title: String
-    @ViewBuilder let content: Content
+private struct TodaySurface: View {
+    let grayRateText: String
+    let verifiedText: String
+    let breaksText: String
+    let relapseText: String
+    let statusTitle: String
+    let statusDetail: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text(title)
-                .font(.system(size: 13, weight: .semibold, design: .serif))
-                .foregroundStyle(MonochromeTheme.secondaryText)
-                .textCase(.uppercase)
-                .tracking(1.3)
+            HStack(alignment: .bottom, spacing: 20) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(grayRateText)
+                        .font(.system(size: 56, weight: .ultraLight, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(.white)
 
-            content
+                    Text("Gray Rate Today")
+                        .font(.system(size: 12, weight: .medium, design: .serif))
+                        .foregroundStyle(MonochromeTheme.secondaryText)
+                        .tracking(0.3)
+                }
+
+                Spacer(minLength: 0)
+
+                VStack(alignment: .leading, spacing: 12) {
+                    InlineMetric(title: "Verified", value: verifiedText)
+                    InlineMetric(title: "Breaks", value: breaksText)
+                    InlineMetric(title: "Relapse", value: relapseText)
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text(statusTitle)
+                    .font(.system(size: 20, weight: .medium, design: .serif))
+                    .foregroundStyle(.white)
+
+                Text(statusDetail)
+                    .font(.system(size: 13, weight: .medium, design: .serif))
+                    .foregroundStyle(MonochromeTheme.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(22)
+        .padding(26)
         .background(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
                 .fill(MonochromeTheme.cardBackground)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(MonochromeTheme.cardBorder, lineWidth: 1)
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                .stroke(Color.white.opacity(0.08), lineWidth: 1)
         )
+        .shadow(color: .black.opacity(0.32), radius: 22, x: 0, y: 16)
+    }
+}
+
+private struct ProgressionSurface: View {
+    let currentStreak: String
+    let bestStreak: String
+    let bestDay: String
+    let sevenDayAverage: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            Text("Progression")
+                .font(.system(size: 12, weight: .medium, design: .serif))
+                .foregroundStyle(MonochromeTheme.secondaryText)
+                .tracking(0.5)
+
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 18), count: 2), alignment: .leading, spacing: 18) {
+                MetricBlock(title: "Current Streak", value: currentStreak)
+                MetricBlock(title: "Best Streak", value: bestStreak)
+                MetricBlock(title: "Best Day", value: bestDay)
+                MetricBlock(title: "7-Day Average", value: sevenDayAverage)
+            }
+        }
+        .padding(24)
+        .background(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(MonochromeTheme.cardBackground)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .stroke(Color.white.opacity(0.08), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.24), radius: 18, x: 0, y: 14)
+        // Phone use split stays omitted until the app has a reliable system-backed usage source.
     }
 }
 
@@ -94,10 +130,9 @@ private struct MetricBlock: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
-                .font(.system(size: 11, weight: .medium, design: .serif))
+                .font(.system(size: 10, weight: .medium, design: .serif))
                 .foregroundStyle(MonochromeTheme.tertiaryText)
-                .textCase(.uppercase)
-                .tracking(1.2)
+                .tracking(0.3)
 
             Text(value)
                 .font(.system(size: 24, weight: .light, design: .rounded))
@@ -108,4 +143,54 @@ private struct MetricBlock: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
+}
+
+private struct InlineMetric: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.system(size: 10, weight: .medium, design: .serif))
+                .foregroundStyle(MonochromeTheme.tertiaryText)
+
+            Text(value)
+                .font(.system(size: 18, weight: .light, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(.white.opacity(0.92))
+        }
+    }
+}
+
+#Preview("Home Cards") {
+    ScrollView {
+        SummaryCardsView(
+            todaySnapshot: DayMetricsSnapshot(
+                date: .now,
+                totalVerifiedSeconds: 42_000,
+                breakCount: 1,
+                longestRunSeconds: 18_000,
+                relapseSeconds: 3_600,
+                eligibleSeconds: 54_000,
+                grayRate: 0.78,
+                isQualifying: true,
+                isStrong: false,
+                isPerfect: false,
+                perfectIntact: false,
+                status: .qualifying
+            ),
+            todayStatus: TodayStatusSummary(
+                title: "Still possible to qualify today",
+                detail: "Return now to recover pace."
+            ),
+            currentQualifyingStreak: 5,
+            bestQualifyingStreak: 11,
+            bestDaySeconds: 74_700,
+            sevenDayAverageRate: 0.78
+        )
+        .padding(20)
+    }
+    .background(MonochromeTheme.background)
+    .preferredColorScheme(.dark)
 }

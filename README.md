@@ -6,8 +6,9 @@ Grayscale Timer is a local-first iPhone app that tracks verified grayscale time 
 
 - Detects whether grayscale is currently enabled with the official UIKit accessibility API.
 - Starts a verified run when grayscale turns on and ends it when grayscale turns off.
+- Supports a configurable break debounce of `Immediate`, `15 seconds`, or `60 seconds`.
 - Persists `RunRecord` and `DaySummary` locally.
-- Computes best run, current streak, best streak, qualifying days, perfect days, and heatmap intensity data.
+- Computes gray rate, relapse time, recovery metrics, qualifying and perfect streaks, records, and heatmap intensity from verified data.
 - Presents a monochrome SwiftUI UI optimized to still look intentional in grayscale.
 
 ## Official grayscale APIs used
@@ -29,8 +30,29 @@ Swift bridges them to the names above.
 - On launch it fetches any persisted active run and reconciles it against the current iOS grayscale state.
 - While the app is running, it listens for `UIAccessibility.grayscaleStatusDidChangeNotification`.
 - Every verified grayscale `ON` starts a run if one is not already active.
-- Every verified grayscale `OFF` ends the run, updates `durationSecondsCached`, and rebuilds affected `DaySummary` rows.
+- Every verified grayscale `OFF` either ends the run immediately or starts a debounce window, depending on Settings.
+- If grayscale returns before the debounce window expires, the run continues without counting a break.
 - Runs that cross midnight remain one `RunRecord`, but `MetricsService` splits the contribution by local calendar day when it computes summaries.
+
+## Day logic
+
+- `Gray Rate` uses verified grayscale divided by the most defensible local-day denominator available in the app.
+- For today, the denominator is elapsed local day time since midnight.
+- For past days, the denominator is the full local calendar day length.
+- `Relapse Time` is time outside grayscale after the first verified grayscale time on that day.
+- `Perfect Day` defaults to zero verified breaks on a day with at least some verified grayscale time.
+- Settings can optionally require a perfect day to also qualify.
+
+The app supports two goal modes:
+
+- `Percentage` mode (default)
+  - qualifying day at `70%`
+  - strong day at `85%`
+- `Fixed Hours` mode (compatibility / extreme mode)
+  - defaults to `21h` qualifying
+  - defaults to `23h` strong
+
+Both modes are configurable in Settings.
 
 ## Caveats
 
@@ -38,6 +60,8 @@ Swift bridges them to the names above.
 - Because of that, exact transition timestamps that happen while the process is not running cannot be reconstructed after the fact.
 - The current implementation stores the last verified grayscale checkpoint while active and uses that to avoid inflating verified time when recovery finds grayscale `OFF`.
 - If recovery finds grayscale still `ON` and there is already an active persisted run, the app continues that run to match the requested recovery behavior, but iOS still does not provide historical proof that the state stayed uninterrupted during the time the process was not active.
+- iOS does not provide an official deep link directly to the `Color Filters` page. The app keeps the manual path visible and emphasizes hardware-based quick return methods instead of faking a deeper jump.
+- The app does not currently surface a `Gray vs Color Phone Use` split because this build has no reliable public iOS phone-usage/session source in the existing architecture.
 - The widget is intentionally coarse. It uses a shared local snapshot file inside the app-group container plus WidgetKit timeline refreshes. `Text(..., style: .timer)` can feel live, but WidgetKit still decides the actual update cadence.
 
 ## Project structure
@@ -69,7 +93,7 @@ project.yml
   - `qualified`
   - `perfect`
 
-The qualifying threshold lives in [`Shared/AppConfig.swift`](Shared/AppConfig.swift) as `qualifyingThresholdSeconds`.
+`DaySummary` remains a light cache. Gray rate, relapse time, classification status, and streak semantics are derived at runtime from stored runs plus the current goal settings.
 
 ## Run it
 

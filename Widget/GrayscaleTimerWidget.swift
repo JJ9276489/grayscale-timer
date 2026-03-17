@@ -65,7 +65,7 @@ struct GrayscaleTimerWidgetEntryView: View {
             Spacer(minLength: 0)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Current Streak")
+                Text("Qualifying Streak")
                     .font(.system(size: 11, weight: .medium, design: .serif))
                     .foregroundStyle(MonochromeTheme.tertiaryText)
                     .textCase(.uppercase)
