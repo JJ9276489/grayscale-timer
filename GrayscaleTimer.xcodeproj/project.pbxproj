@@ -1,0 +1,552 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 63;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1EE72A3DDBA4A0231BB59EBD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8470465872D91DF4B608E001 /* SettingsView.swift */; };
+		35C62FB82F970E3B0B5C47AB /* MetricsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 346AFF8730091C2DEA2A5BED /* MetricsService.swift */; };
+		421490D37A0CE47EB3BBDDD6 /* SummaryCardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E4A0169F3BB22899519E6D7 /* SummaryCardsView.swift */; };
+		42BDE437C2CE62DC22E0B4FB /* GrayscaleTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8197F44FAB13F214FD3272 /* GrayscaleTrackingManager.swift */; };
+		443E85F4556B1D1BF36332F8 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9268BF48C2D62A3628BDD45 /* PersistenceController.swift */; };
+		466BBD9FFF7FCE530A08F13B /* WidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBFDDF69956D21982B73EB9 /* WidgetSnapshot.swift */; };
+		63A89C76DF76A4C00C0FDEF4 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B14D3FA8674ED18B8854AEB5 /* HistoryView.swift */; };
+		6C6143989E83E39DF9226796 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17F1D8AE6DA4ACBEC025FFA /* DurationFormatter.swift */; };
+		8145EE202E8D48D97D781F62 /* MonochromeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98972233D135D5F41A9A4FA4 /* MonochromeTheme.swift */; };
+		8A1C518836C52CC4365AB51B /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BDF06BB26D2453B1182B2F8 /* AppConfig.swift */; };
+		8BFD543DBDC200CBC43D1DE6 /* Grayscale Timer Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = CD7D11DE8642954CBC7F4F8E /* Grayscale Timer Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		900D2F7AD0E1C8C794E7A572 /* HeatmapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB77E48167AA977F8FE766D5 /* HeatmapView.swift */; };
+		A3B367B24256B65CC4B07951 /* WidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBFDDF69956D21982B73EB9 /* WidgetSnapshot.swift */; };
+		A7CA989C382EF3201C837E19 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BDF06BB26D2453B1182B2F8 /* AppConfig.swift */; };
+		B2BBF16F2623776084F6A6B4 /* MonochromeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98972233D135D5F41A9A4FA4 /* MonochromeTheme.swift */; };
+		B3B376957E6410435CA5B871 /* GrayscaleTimerWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62F27BDBAE9510C66FADD02E /* GrayscaleTimerWidget.swift */; };
+		C70E1592A5FEC7357437FE31 /* RunTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F153E84F27BFDB4CBCF1CB8 /* RunTimerView.swift */; };
+		CF86CA6F1577F436CC6EC62E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F218E04FE97628333F258AC9 /* HomeView.swift */; };
+		D086A65364174B71E8590B2A /* GrayscaleTimerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B820FA788CED80222E52852 /* GrayscaleTimerApp.swift */; };
+		DD2AA530E3F807A921CAEE13 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FC597499BBD74E97B9077D /* RootTabView.swift */; };
+		DE7A10F6380DC16C7072B6F4 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97851600BE43975F95A3B0B2 /* Models.swift */; };
+		E40DC404E52173BEF9BD7248 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17F1D8AE6DA4ACBEC025FFA /* DurationFormatter.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A45F5BD893BE505E6C5F72DB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E2ABDA639C612EB445BA76E6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3880E81BD22BA3365434DB01;
+			remoteInfo = GrayscaleTimerWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C2A1AA586774E958AFC34C5B /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				8BFD543DBDC200CBC43D1DE6 /* Grayscale Timer Widget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		16FC597499BBD74E97B9077D /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		346AFF8730091C2DEA2A5BED /* MetricsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsService.swift; sourceTree = "<group>"; };
+		435E3DBA0F26F49462664E5B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		447A13896BC8DEE000946259 /* GrayscaleTimer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GrayscaleTimer.entitlements; sourceTree = "<group>"; };
+		5B8197F44FAB13F214FD3272 /* GrayscaleTrackingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrayscaleTrackingManager.swift; sourceTree = "<group>"; };
+		62F27BDBAE9510C66FADD02E /* GrayscaleTimerWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrayscaleTimerWidget.swift; sourceTree = "<group>"; };
+		6BBFDDF69956D21982B73EB9 /* WidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSnapshot.swift; sourceTree = "<group>"; };
+		7BDF06BB26D2453B1182B2F8 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
+		7E4A0169F3BB22899519E6D7 /* SummaryCardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryCardsView.swift; sourceTree = "<group>"; };
+		7F153E84F27BFDB4CBCF1CB8 /* RunTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunTimerView.swift; sourceTree = "<group>"; };
+		8470465872D91DF4B608E001 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		8B820FA788CED80222E52852 /* GrayscaleTimerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrayscaleTimerApp.swift; sourceTree = "<group>"; };
+		94DA7B5D59CA653E7B74C2F2 /* GrayscaleTimerWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GrayscaleTimerWidget.entitlements; sourceTree = "<group>"; };
+		97851600BE43975F95A3B0B2 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		98972233D135D5F41A9A4FA4 /* MonochromeTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonochromeTheme.swift; sourceTree = "<group>"; };
+		ADB64B47F25D6B0711CAB3A3 /* Grayscale Timer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Grayscale Timer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B14D3FA8674ED18B8854AEB5 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		BB77E48167AA977F8FE766D5 /* HeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatmapView.swift; sourceTree = "<group>"; };
+		CD7D11DE8642954CBC7F4F8E /* Grayscale Timer Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Grayscale Timer Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE0E397D6B284083CA8324BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		D17F1D8AE6DA4ACBEC025FFA /* DurationFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationFormatter.swift; sourceTree = "<group>"; };
+		F218E04FE97628333F258AC9 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		F9268BF48C2D62A3628BDD45 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		398488FFEFC395202416DB56 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				8470465872D91DF4B608E001 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		7A236255159777CC7D91E610 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				ADB64B47F25D6B0711CAB3A3 /* Grayscale Timer.app */,
+				CD7D11DE8642954CBC7F4F8E /* Grayscale Timer Widget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		928D0238C3C838BC26A35A7C /* App */ = {
+			isa = PBXGroup;
+			children = (
+				447A13896BC8DEE000946259 /* GrayscaleTimer.entitlements */,
+				8B820FA788CED80222E52852 /* GrayscaleTimerApp.swift */,
+				CE0E397D6B284083CA8324BD /* Info.plist */,
+				16FC597499BBD74E97B9077D /* RootTabView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		94FF574D2203CC65A6207BFD /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				C59AA0A8C2320A11A3B80935 /* History */,
+				AB8302393F759B63AB842EF4 /* Home */,
+				398488FFEFC395202416DB56 /* Settings */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		970D74028A8904E5970F7B05 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				5B8197F44FAB13F214FD3272 /* GrayscaleTrackingManager.swift */,
+				346AFF8730091C2DEA2A5BED /* MetricsService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		AB8302393F759B63AB842EF4 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				F218E04FE97628333F258AC9 /* HomeView.swift */,
+				7F153E84F27BFDB4CBCF1CB8 /* RunTimerView.swift */,
+				7E4A0169F3BB22899519E6D7 /* SummaryCardsView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		C59AA0A8C2320A11A3B80935 /* History */ = {
+			isa = PBXGroup;
+			children = (
+				BB77E48167AA977F8FE766D5 /* HeatmapView.swift */,
+				B14D3FA8674ED18B8854AEB5 /* HistoryView.swift */,
+			);
+			path = History;
+			sourceTree = "<group>";
+		};
+		CAF843C68B8D4C5939F4D9FB = {
+			isa = PBXGroup;
+			children = (
+				928D0238C3C838BC26A35A7C /* App */,
+				94FF574D2203CC65A6207BFD /* Features */,
+				CE34F18CB99F22D39FF53BD8 /* Persistence */,
+				970D74028A8904E5970F7B05 /* Services */,
+				F595BE542E21A76C8C598F34 /* Shared */,
+				E58240B4BD773B4B70F62D56 /* Widget */,
+				7A236255159777CC7D91E610 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CE34F18CB99F22D39FF53BD8 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				97851600BE43975F95A3B0B2 /* Models.swift */,
+				F9268BF48C2D62A3628BDD45 /* PersistenceController.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		E58240B4BD773B4B70F62D56 /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				94DA7B5D59CA653E7B74C2F2 /* GrayscaleTimerWidget.entitlements */,
+				62F27BDBAE9510C66FADD02E /* GrayscaleTimerWidget.swift */,
+				435E3DBA0F26F49462664E5B /* Info.plist */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
+		F595BE542E21A76C8C598F34 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				7BDF06BB26D2453B1182B2F8 /* AppConfig.swift */,
+				D17F1D8AE6DA4ACBEC025FFA /* DurationFormatter.swift */,
+				98972233D135D5F41A9A4FA4 /* MonochromeTheme.swift */,
+				6BBFDDF69956D21982B73EB9 /* WidgetSnapshot.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3880E81BD22BA3365434DB01 /* GrayscaleTimerWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 161EEA2594CCC879091BDD7B /* Build configuration list for PBXNativeTarget "GrayscaleTimerWidgetExtension" */;
+			buildPhases = (
+				F1EAFBEA71BD1D1D033657D3 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GrayscaleTimerWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = GrayscaleTimerWidgetExtension;
+			productReference = CD7D11DE8642954CBC7F4F8E /* Grayscale Timer Widget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		D92D48D63A92F8553C547B8B /* GrayscaleTimer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A3E0AB2547BDDBCD54E86611 /* Build configuration list for PBXNativeTarget "GrayscaleTimer" */;
+			buildPhases = (
+				EBE85497E968007D00394BB6 /* Sources */,
+				C2A1AA586774E958AFC34C5B /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				44244599F2F60F10D405E174 /* PBXTargetDependency */,
+			);
+			name = GrayscaleTimer;
+			packageProductDependencies = (
+			);
+			productName = GrayscaleTimer;
+			productReference = ADB64B47F25D6B0711CAB3A3 /* Grayscale Timer.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E2ABDA639C612EB445BA76E6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+			};
+			buildConfigurationList = 523A12ACBD9637E46BD5A166 /* Build configuration list for PBXProject "GrayscaleTimer" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = CAF843C68B8D4C5939F4D9FB;
+			minimizedProjectReferenceProxies = 1;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D92D48D63A92F8553C547B8B /* GrayscaleTimer */,
+				3880E81BD22BA3365434DB01 /* GrayscaleTimerWidgetExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		EBE85497E968007D00394BB6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8A1C518836C52CC4365AB51B /* AppConfig.swift in Sources */,
+				E40DC404E52173BEF9BD7248 /* DurationFormatter.swift in Sources */,
+				D086A65364174B71E8590B2A /* GrayscaleTimerApp.swift in Sources */,
+				42BDE437C2CE62DC22E0B4FB /* GrayscaleTrackingManager.swift in Sources */,
+				900D2F7AD0E1C8C794E7A572 /* HeatmapView.swift in Sources */,
+				63A89C76DF76A4C00C0FDEF4 /* HistoryView.swift in Sources */,
+				CF86CA6F1577F436CC6EC62E /* HomeView.swift in Sources */,
+				35C62FB82F970E3B0B5C47AB /* MetricsService.swift in Sources */,
+				DE7A10F6380DC16C7072B6F4 /* Models.swift in Sources */,
+				B2BBF16F2623776084F6A6B4 /* MonochromeTheme.swift in Sources */,
+				443E85F4556B1D1BF36332F8 /* PersistenceController.swift in Sources */,
+				DD2AA530E3F807A921CAEE13 /* RootTabView.swift in Sources */,
+				C70E1592A5FEC7357437FE31 /* RunTimerView.swift in Sources */,
+				1EE72A3DDBA4A0231BB59EBD /* SettingsView.swift in Sources */,
+				421490D37A0CE47EB3BBDDD6 /* SummaryCardsView.swift in Sources */,
+				A3B367B24256B65CC4B07951 /* WidgetSnapshot.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F1EAFBEA71BD1D1D033657D3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7CA989C382EF3201C837E19 /* AppConfig.swift in Sources */,
+				6C6143989E83E39DF9226796 /* DurationFormatter.swift in Sources */,
+				B3B376957E6410435CA5B871 /* GrayscaleTimerWidget.swift in Sources */,
+				8145EE202E8D48D97D781F62 /* MonochromeTheme.swift in Sources */,
+				466BBD9FFF7FCE530A08F13B /* WidgetSnapshot.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		44244599F2F60F10D405E174 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3880E81BD22BA3365434DB01 /* GrayscaleTimerWidgetExtension */;
+			targetProxy = A45F5BD893BE505E6C5F72DB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		92B1FDC35CFF47BCB9F02DC7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = Widget/GrayscaleTimerWidget.entitlements;
+				DEVELOPMENT_TEAM = QS778F32P4;
+				INFOPLIST_FILE = Widget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jeraldyuan.GrayscaleTimer.Widget;
+				PRODUCT_NAME = "Grayscale Timer Widget";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		92BE090BCEA09CC865AC6ACE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				APP_GROUP_IDENTIFIER = group.com.jeraldyuan.GrayscaleTimer;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		A731F29E4E42959D32B358ED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				APP_GROUP_IDENTIFIER = group.com.jeraldyuan.GrayscaleTimer;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		C1321C990E98B3AEBA440237 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = Widget/GrayscaleTimerWidget.entitlements;
+				DEVELOPMENT_TEAM = QS778F32P4;
+				INFOPLIST_FILE = Widget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jeraldyuan.GrayscaleTimer.Widget;
+				PRODUCT_NAME = "Grayscale Timer Widget";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		C1D7FE434F0795CCDE0E75B7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/GrayscaleTimer.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = QS778F32P4;
+				INFOPLIST_FILE = App/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jeraldyuan.GrayscaleTimer;
+				PRODUCT_NAME = "Grayscale Timer";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		DDE75A38BC88F44B1A1FF44B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/GrayscaleTimer.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = QS778F32P4;
+				INFOPLIST_FILE = App/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jeraldyuan.GrayscaleTimer;
+				PRODUCT_NAME = "Grayscale Timer";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		161EEA2594CCC879091BDD7B /* Build configuration list for PBXNativeTarget "GrayscaleTimerWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				92B1FDC35CFF47BCB9F02DC7 /* Debug */,
+				C1321C990E98B3AEBA440237 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		523A12ACBD9637E46BD5A166 /* Build configuration list for PBXProject "GrayscaleTimer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A731F29E4E42959D32B358ED /* Debug */,
+				92BE090BCEA09CC865AC6ACE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A3E0AB2547BDDBCD54E86611 /* Build configuration list for PBXNativeTarget "GrayscaleTimer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C1D7FE434F0795CCDE0E75B7 /* Debug */,
+				DDE75A38BC88F44B1A1FF44B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E2ABDA639C612EB445BA76E6 /* Project object */;
+}
