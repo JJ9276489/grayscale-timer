@@ -2,22 +2,25 @@ import SwiftUI
 
 struct SummaryCardsView: View {
     let todaySnapshot: DayMetricsSnapshot
-    let todayStatus: TodayStatusSummary
+    let todayFooterText: String?
     let currentQualifyingStreak: Int
     let bestQualifyingStreak: Int
     let bestDaySeconds: Double
     let sevenDayAverageRate: Double
+    let onTodayTap: () -> Void
 
     var body: some View {
         VStack(spacing: 18) {
-            TodaySurface(
-                grayRateText: percentString(todaySnapshot.grayRate),
-                verifiedText: DurationFormatter.statString(seconds: todaySnapshot.totalVerifiedSeconds),
-                breaksText: "\(todaySnapshot.breakCount)",
-                relapseText: DurationFormatter.statString(seconds: todaySnapshot.relapseSeconds),
-                statusTitle: todayStatus.title,
-                statusDetail: todayStatus.detail
-            )
+            Button(action: onTodayTap) {
+                TodaySurface(
+                    grayRateText: percentString(todaySnapshot.grayRate),
+                    verifiedText: DurationFormatter.statString(seconds: todaySnapshot.totalVerifiedSeconds),
+                    breaksText: "\(todaySnapshot.breakCount)",
+                    relapseText: DurationFormatter.statString(seconds: todaySnapshot.relapseSeconds),
+                    footerText: todayFooterText
+                )
+            }
+            .buttonStyle(TactileSurfaceButtonStyle(cornerRadius: 30))
 
             ProgressionSurface(
                 currentStreak: "\(currentQualifyingStreak)",
@@ -38,8 +41,7 @@ private struct TodaySurface: View {
     let verifiedText: String
     let breaksText: String
     let relapseText: String
-    let statusTitle: String
-    let statusDetail: String
+    let footerText: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -65,12 +67,8 @@ private struct TodaySurface: View {
                 }
             }
 
-            VStack(alignment: .leading, spacing: 6) {
-                Text(statusTitle)
-                    .font(.system(size: 20, weight: .medium, design: .serif))
-                    .foregroundStyle(.white)
-
-                Text(statusDetail)
+            if let footerText {
+                Text(footerText)
                     .font(.system(size: 13, weight: .medium, design: .serif))
                     .foregroundStyle(MonochromeTheme.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
@@ -102,11 +100,17 @@ private struct ProgressionSurface: View {
                 .foregroundStyle(MonochromeTheme.secondaryText)
                 .tracking(0.5)
 
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 18), count: 2), alignment: .leading, spacing: 18) {
-                MetricBlock(title: "Current Streak", value: currentStreak)
-                MetricBlock(title: "Best Streak", value: bestStreak)
-                MetricBlock(title: "Best Day", value: bestDay)
-                MetricBlock(title: "7-Day Average", value: sevenDayAverage)
+            HStack(spacing: 18) {
+                MetricBlock(title: "Current Streak", value: currentStreak, prominence: .primary)
+                MetricBlock(title: "Best Streak", value: bestStreak, prominence: .primary)
+            }
+
+            Divider()
+                .overlay(Color.white.opacity(0.07))
+
+            HStack(spacing: 18) {
+                MetricBlock(title: "Best Day", value: bestDay, prominence: .secondary)
+                MetricBlock(title: "7-Day Average", value: sevenDayAverage, prominence: .secondary)
             }
         }
         .padding(24)
@@ -124,8 +128,14 @@ private struct ProgressionSurface: View {
 }
 
 private struct MetricBlock: View {
+    enum Prominence {
+        case primary
+        case secondary
+    }
+
     let title: String
     let value: String
+    let prominence: Prominence
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -135,9 +145,9 @@ private struct MetricBlock: View {
                 .tracking(0.3)
 
             Text(value)
-                .font(.system(size: 24, weight: .light, design: .rounded))
+                .font(.system(size: prominence == .primary ? 30 : 20, weight: .light, design: .rounded))
                 .monospacedDigit()
-                .foregroundStyle(.white)
+                .foregroundStyle(.white.opacity(prominence == .primary ? 1 : 0.9))
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
         }
@@ -180,14 +190,12 @@ private struct InlineMetric: View {
                 perfectIntact: false,
                 status: .qualifying
             ),
-            todayStatus: TodayStatusSummary(
-                title: "Still possible to qualify today",
-                detail: "Return now to recover pace."
-            ),
+            todayFooterText: "Return now to recover pace.",
             currentQualifyingStreak: 5,
             bestQualifyingStreak: 11,
             bestDaySeconds: 74_700,
-            sevenDayAverageRate: 0.78
+            sevenDayAverageRate: 0.78,
+            onTodayTap: {}
         )
         .padding(20)
     }

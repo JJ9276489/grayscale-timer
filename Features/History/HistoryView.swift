@@ -61,16 +61,6 @@ struct HistoryView: View {
                 let bestWeek = weeklyAggregates.max { $0.averageGrayRate < $1.averageGrayRate }
 
                 VStack(alignment: .leading, spacing: 20) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("History")
-                            .font(.system(size: 28, weight: .light, design: .serif))
-                            .foregroundStyle(.white)
-
-                        Text("Cell brightness follows gray rate. Perfect days are outlined.")
-                            .font(.system(size: 14, weight: .medium, design: .serif))
-                            .foregroundStyle(MonochromeTheme.secondaryText)
-                    }
-
                     Picker("Range", selection: $selectedRange) {
                         ForEach(HistoryRange.allCases) { range in
                             Text(range.title).tag(range)
@@ -98,7 +88,7 @@ struct HistoryView: View {
                             )
                         )
 
-                        Text(selectedRange == .days28 ? "Last 28 days." : "Last 90 days.")
+                        Text(selectedRange == .days28 ? "Last 28 days. Perfect days are outlined." : "Last 90 days. Perfect days are outlined.")
                             .font(.system(size: 12, weight: .medium, design: .serif))
                             .foregroundStyle(MonochromeTheme.tertiaryText)
                     }
@@ -113,8 +103,12 @@ struct HistoryView: View {
                     )
                     .shadow(color: .black.opacity(0.26), radius: 18, x: 0, y: 14)
 
-                    SelectedDayCard(snapshot: daySnapshot, date: selectedDate, goalSettings: goalSettings)
-                        .animation(.spring(response: 0.32, dampingFraction: 0.86), value: selectedDate)
+                    ZStack {
+                        DayDetailView(snapshot: daySnapshot, date: selectedDate, goalSettings: goalSettings)
+                            .id(daySnapshot.id)
+                            .transition(.opacity.combined(with: .scale(scale: 0.985)))
+                    }
+                    .animation(.spring(response: 0.32, dampingFraction: 0.86), value: selectedDate)
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 16)
@@ -179,143 +173,8 @@ private struct WeeklyMetric: View {
     }
 }
 
-private struct SelectedDayCard: View {
-    let snapshot: DayMetricsSnapshot
-    let date: Date
-    let goalSettings: GoalSettings
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            HStack(alignment: .top, spacing: 16) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(date, format: .dateTime.month(.wide).day().year())
-                        .font(.system(size: 22, weight: .light, design: .serif))
-                        .foregroundStyle(.white)
-
-                    Text(snapshot.status.title)
-                        .font(.system(size: 30, weight: .medium, design: .serif))
-                        .foregroundStyle(.white.opacity(0.96))
-                }
-
-                Spacer(minLength: 0)
-
-                if let summaryText = MetricsService.summaryText(for: snapshot, goalSettings: goalSettings) {
-                    StatusChip(text: summaryText)
-                }
-            }
-
-            ContinuityStrip(snapshot: snapshot)
-
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 18), count: 2), alignment: .leading, spacing: 18) {
-                DetailMetric(title: "Gray Rate", value: percentString(snapshot.grayRate))
-                DetailMetric(title: "Verified", value: DurationFormatter.statString(seconds: snapshot.totalVerifiedSeconds))
-                DetailMetric(title: "Breaks", value: "\(snapshot.breakCount)")
-                DetailMetric(title: "Relapse", value: DurationFormatter.statString(seconds: snapshot.relapseSeconds))
-                DetailMetric(title: "Longest Run", value: DurationFormatter.statString(seconds: snapshot.longestRunSeconds))
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(24)
-        .background(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(MonochromeTheme.cardBackground)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(Color.white.opacity(0.08), lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(0.28), radius: 18, x: 0, y: 14)
-        .contentTransition(.opacity)
-    }
-
-    private func percentString(_ value: Double) -> String {
-        "\(Int((value * 100).rounded()))%"
-    }
-}
-
-private struct DetailMetric: View {
-    let title: String
-    let value: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.system(size: 11, weight: .medium, design: .serif))
-                .foregroundStyle(MonochromeTheme.tertiaryText)
-
-            Text(value)
-                .font(.system(size: 19, weight: .light, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(.white)
-        }
-    }
-}
-
-private struct ContinuityStrip: View {
-    let snapshot: DayMetricsSnapshot
-
-    var body: some View {
-        GeometryReader { geometry in
-            let fillWidth = max(12, geometry.size.width * snapshot.grayRate)
-
-            ZStack(alignment: .leading) {
-                Capsule(style: .continuous)
-                    .fill(Color.white.opacity(0.06))
-
-                Capsule(style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.8),
-                                Color.white.opacity(0.22)
-                            ],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .frame(width: fillWidth)
-
-                HStack(spacing: 4) {
-                    ForEach(0..<min(snapshot.breakCount, 6), id: \.self) { _ in
-                        Capsule(style: .continuous)
-                            .fill(Color.black.opacity(0.55))
-                            .frame(width: 3, height: 12)
-                    }
-                }
-                .padding(.leading, 10)
-                .opacity(snapshot.breakCount > 0 ? 1 : 0)
-            }
-        }
-        .frame(height: 16)
-        .overlay(
-            Capsule(style: .continuous)
-                .stroke(Color.white.opacity(0.08), lineWidth: 1)
-        )
-    }
-}
-
-private struct StatusChip: View {
-    let text: String
-
-    var body: some View {
-        Text(text)
-            .font(.system(size: 11, weight: .semibold, design: .serif))
-            .foregroundStyle(.white)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 7)
-            .background(
-                Capsule(style: .continuous)
-                    .fill(Color.white.opacity(0.08))
-            )
-            .overlay(
-                Capsule(style: .continuous)
-                    .stroke(Color.white.opacity(0.14), lineWidth: 1)
-            )
-    }
-}
-
 #Preview("History Detail - Qualifying") {
-    SelectedDayCard(
+    DayDetailView(
         snapshot: DayMetricsSnapshot(
             date: .now,
             totalVerifiedSeconds: 68_400,
@@ -339,7 +198,7 @@ private struct StatusChip: View {
 }
 
 #Preview("History Detail - Strong") {
-    SelectedDayCard(
+    DayDetailView(
         snapshot: DayMetricsSnapshot(
             date: .now,
             totalVerifiedSeconds: 78_000,
@@ -363,7 +222,7 @@ private struct StatusChip: View {
 }
 
 #Preview("History Detail - Perfect") {
-    SelectedDayCard(
+    DayDetailView(
         snapshot: DayMetricsSnapshot(
             date: .now,
             totalVerifiedSeconds: 80_000,
@@ -387,7 +246,7 @@ private struct StatusChip: View {
 }
 
 #Preview("History Detail - Missed") {
-    SelectedDayCard(
+    DayDetailView(
         snapshot: DayMetricsSnapshot(
             date: .now,
             totalVerifiedSeconds: 18_000,

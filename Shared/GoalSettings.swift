@@ -67,29 +67,79 @@ enum QuickReturnMethod: String, CaseIterable, Identifiable {
         }
     }
 
-    var summary: String {
+    var tagTitle: String {
         switch self {
         case .accessibilityShortcut:
-            return "Assign Color Filters to side-button triple-click."
+            return "Best"
         case .actionButton:
-            return "Use the Action Button to trigger Accessibility."
+            return "Fast if supported"
         case .backTap:
-            return "Map Back Tap to Accessibility Shortcut."
+            return "Convenient"
         case .controlCenter:
-            return "Add Accessibility Shortcuts to Control Center."
+            return "Fallback"
         }
     }
 
-    var setupInstruction: String {
+    var subtitle: String {
+        switch self {
+        case .accessibilityShortcut:
+            return "Best overall for most users."
+        case .actionButton:
+            return "Fast on supported iPhones."
+        case .backTap:
+            return "Convenient if you prefer a gesture."
+        case .controlCenter:
+            return "Reliable when hardware controls are occupied."
+        }
+    }
+
+    var summary: String {
+        switch self {
+        case .accessibilityShortcut:
+            return "One hardware gesture back to grayscale."
+        case .actionButton:
+            return "A dedicated hardware press for recovery."
+        case .backTap:
+            return "A quick device gesture when buttons are busy."
+        case .controlCenter:
+            return "Universal fallback without special hardware."
+        }
+    }
+
+    var instruction: String {
         switch self {
         case .accessibilityShortcut:
             return "Assign Color Filters to Side Button Triple-Click."
         case .actionButton:
-            return "Set Action Button to Accessibility, then include Color Filters."
+            return "Set the Action Button to Accessibility Shortcut, then include Color Filters."
         case .backTap:
             return "Map Double Tap or Triple Tap to Accessibility Shortcut."
         case .controlCenter:
-            return "Add Accessibility Shortcuts to Control Center."
+            return "Add Accessibility Shortcuts to Control Center for quick recovery."
+        }
+    }
+
+    var settingsPaths: [String] {
+        switch self {
+        case .accessibilityShortcut:
+            return [
+                "Settings → Accessibility → Accessibility Shortcut → Color Filters"
+            ]
+        case .actionButton:
+            return [
+                "Settings → Action Button → Accessibility Shortcut",
+                "Then: Settings → Accessibility → Accessibility Shortcut → Color Filters"
+            ]
+        case .backTap:
+            return [
+                "Settings → Accessibility → Touch → Back Tap → Accessibility Shortcut",
+                "Then: Settings → Accessibility → Accessibility Shortcut → Color Filters"
+            ]
+        case .controlCenter:
+            return [
+                "Settings → Control Center → add Accessibility Shortcuts",
+                "Then ensure Accessibility Shortcuts includes Color Filters"
+            ]
         }
     }
 
@@ -148,6 +198,19 @@ struct GoalSettings: Equatable, Hashable {
             return grayRate >= strongRate
         case .fixedHours:
             return totalVerifiedSeconds >= fixedStrongSeconds
+        }
+    }
+}
+
+extension GoalSettings {
+    func qualifyingProgress(totalVerifiedSeconds: Double, grayRate: Double) -> Double {
+        switch mode {
+        case .percentage:
+            guard qualifyingRate > 0 else { return 0 }
+            return min(max(grayRate / qualifyingRate, 0), 1)
+        case .fixedHours:
+            guard fixedQualifyingSeconds > 0 else { return 0 }
+            return min(max(totalVerifiedSeconds / fixedQualifyingSeconds, 0), 1)
         }
     }
 }

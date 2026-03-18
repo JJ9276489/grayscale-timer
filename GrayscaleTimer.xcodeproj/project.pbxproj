@@ -13,6 +13,7 @@
 		42BDE437C2CE62DC22E0B4FB /* GrayscaleTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8197F44FAB13F214FD3272 /* GrayscaleTrackingManager.swift */; };
 		443E85F4556B1D1BF36332F8 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9268BF48C2D62A3628BDD45 /* PersistenceController.swift */; };
 		466BBD9FFF7FCE530A08F13B /* WidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBFDDF69956D21982B73EB9 /* WidgetSnapshot.swift */; };
+		4F24C6B0789AE7B68F707832 /* InspectViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEE02C88A00CC2449E6C758 /* InspectViews.swift */; };
 		5D99A0FF3E214C80A1671B7B /* GoalSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0198FD14BD5F424364522876 /* GoalSettings.swift */; };
 		63A89C76DF76A4C00C0FDEF4 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B14D3FA8674ED18B8854AEB5 /* HistoryView.swift */; };
 		6C6143989E83E39DF9226796 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17F1D8AE6DA4ACBEC025FFA /* DurationFormatter.swift */; };
@@ -82,6 +83,7 @@
 		D17F1D8AE6DA4ACBEC025FFA /* DurationFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationFormatter.swift; sourceTree = "<group>"; };
 		F218E04FE97628333F258AC9 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		F9268BF48C2D62A3628BDD45 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+		FAEE02C88A00CC2449E6C758 /* InspectViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspectViews.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -119,6 +121,7 @@
 				C59AA0A8C2320A11A3B80935 /* History */,
 				AB8302393F759B63AB842EF4 /* Home */,
 				398488FFEFC395202416DB56 /* Settings */,
+				A8070D714C435352892ACAE1 /* Shared */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -130,6 +133,14 @@
 				346AFF8730091C2DEA2A5BED /* MetricsService.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		A8070D714C435352892ACAE1 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				FAEE02C88A00CC2449E6C758 /* InspectViews.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		AB8302393F759B63AB842EF4 /* Home */ = {
@@ -275,6 +286,7 @@
 				900D2F7AD0E1C8C794E7A572 /* HeatmapView.swift in Sources */,
 				63A89C76DF76A4C00C0FDEF4 /* HistoryView.swift in Sources */,
 				CF86CA6F1577F436CC6EC62E /* HomeView.swift in Sources */,
+				4F24C6B0789AE7B68F707832 /* InspectViews.swift in Sources */,
 				35C62FB82F970E3B0B5C47AB /* MetricsService.swift in Sources */,
 				DE7A10F6380DC16C7072B6F4 /* Models.swift in Sources */,
 				B2BBF16F2623776084F6A6B4 /* MonochromeTheme.swift in Sources */,
