@@ -8,17 +8,11 @@ struct SettingsView: View {
     @AppStorage(GoalSettingsStore.Key.fixedStrongHours) private var fixedStrongHours = AppConfig.defaultStrongThresholdSeconds / 3_600
     @AppStorage(GoalSettingsStore.Key.perfectRequiresQualification) private var perfectRequiresQualification = AppConfig.defaultPerfectRequiresQualification
     @AppStorage(GoalSettingsStore.Key.breakDebounceSeconds) private var breakDebounceSeconds = AppConfig.defaultBreakDebounceSeconds
-    @AppStorage(GoalSettingsStore.Key.quickReturnMethod) private var quickReturnMethodRawValue = QuickReturnMethod.accessibilityShortcut.rawValue
 
     @State private var showDefinitions = false
-    @State private var presentedQuickReturnMethod: QuickReturnMethod?
 
     private var goalMode: GoalMode {
         GoalMode(rawValue: goalModeRawValue) ?? .percentage
-    }
-
-    private var selectedQuickReturnMethod: QuickReturnMethod {
-        QuickReturnMethod(rawValue: quickReturnMethodRawValue) ?? .accessibilityShortcut
     }
 
     private var selectedDebounceOption: BreakDebounceOption {
@@ -97,25 +91,8 @@ struct SettingsView: View {
                     }
                 }
 
-                CompactSettingsSurface(title: "Quick Return") {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Choose what Home suggests when grayscale is off. Setup still happens in iOS.")
-                            .font(.system(size: 12, weight: .medium, design: .serif))
-                            .foregroundStyle(MonochromeTheme.secondaryText)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        ForEach(QuickReturnMethod.allCases) { method in
-                            QuickReturnRow(
-                                method: method,
-                                isPreferred: method == selectedQuickReturnMethod,
-                                onOpen: { presentedQuickReturnMethod = method }
-                            )
-                        }
-                    }
-                }
-
                 CompactSettingsSurface(title: "Enable Grayscale") {
-                    VStack(alignment: .leading, spacing: 10) {
+                    VStack(alignment: .leading, spacing: 12) {
                         Text("No direct jump is available for Color Filters.")
                             .font(.system(size: 13, weight: .medium, design: .serif))
                             .foregroundStyle(MonochromeTheme.secondaryText)
@@ -124,18 +101,26 @@ struct SettingsView: View {
                             .font(.system(size: 15, weight: .medium, design: .serif))
                             .foregroundStyle(.white)
                             .fixedSize(horizontal: false, vertical: true)
+
+                        Text("Turn Color Filters on, then choose Grayscale.")
+                            .font(.system(size: 12, weight: .medium, design: .serif))
+                            .foregroundStyle(MonochromeTheme.tertiaryText)
                     }
                 }
 
                 CompactSettingsSurface(title: "About") {
                     DisclosureGroup(isExpanded: $showDefinitions) {
                         VStack(alignment: .leading, spacing: 14) {
-                            DefinitionRow(title: "Verified Time", detail: "Only time iOS directly reports while the app can verify grayscale.")
+                            DefinitionRow(title: "Verified Time", detail: "Recorded from grayscale-on runs the app observes and reconciles from the current iOS state.")
                             DefinitionRow(title: "Gray Rate", detail: "Verified grayscale divided by elapsed local day time. Past days use the full local calendar day.")
                             DefinitionRow(title: "Break", detail: "A verified off transition after the selected debounce interval.")
                             DefinitionRow(title: "Relapse Time", detail: "Time outside grayscale after the first verified grayscale time on that day.")
                             DefinitionRow(title: "Qualifying Day", detail: qualifyingDefinition)
                             DefinitionRow(title: "Perfect Day", detail: perfectDefinition)
+
+                            Text("iOS does not provide a historical grayscale event feed while the app is suspended.")
+                                .font(.system(size: 12, weight: .medium, design: .serif))
+                                .foregroundStyle(MonochromeTheme.secondaryText)
 
                             Text("Local only. No backend, account, or analytics.")
                                 .font(.system(size: 12, weight: .medium, design: .serif))
@@ -158,15 +143,6 @@ struct SettingsView: View {
         .background(MonochromeTheme.background.ignoresSafeArea())
         .navigationTitle("Settings")
         .toolbarTitleDisplayMode(.inline)
-        .sheet(item: $presentedQuickReturnMethod) { method in
-            QuickReturnInstructionSheet(
-                method: method,
-                isPreferred: method == selectedQuickReturnMethod,
-                onMarkPreferred: { quickReturnMethodRawValue = method.rawValue }
-            )
-            .presentationDetents([.height(340), .medium])
-            .presentationDragIndicator(.visible)
-        }
     }
 
     private var qualifyingDefinition: String {
@@ -214,191 +190,6 @@ struct SettingsView: View {
         }
 
         return "\(String(format: "%.1f", value))h"
-    }
-}
-
-private struct QuickReturnRow: View {
-    let method: QuickReturnMethod
-    let isPreferred: Bool
-    let onOpen: () -> Void
-
-    var body: some View {
-        Button(action: onOpen) {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(alignment: .top, spacing: 12) {
-                    VStack(alignment: .leading, spacing: 5) {
-                        HStack(spacing: 8) {
-                            Text(method.title)
-                                .font(.system(size: 15, weight: .medium, design: .serif))
-                                .foregroundStyle(.white)
-
-                            MethodTag(text: method.tagTitle, emphasized: method.isRecommended)
-                        }
-
-                        Text(method.summary)
-                            .font(.system(size: 12, weight: .medium, design: .serif))
-                            .foregroundStyle(MonochromeTheme.secondaryText)
-                            .multilineTextAlignment(.leading)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    VStack(alignment: .trailing, spacing: 8) {
-                        if isPreferred {
-                            Text("Preferred")
-                                .font(.system(size: 10, weight: .semibold, design: .serif))
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(
-                                    Capsule(style: .continuous)
-                                        .fill(Color.white.opacity(0.08))
-                                )
-                                .overlay(
-                                    Capsule(style: .continuous)
-                                        .stroke(Color.white.opacity(0.12), lineWidth: 1)
-                                )
-                        }
-
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundStyle(MonochromeTheme.tertiaryText)
-                    }
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(Color.white.opacity(isPreferred ? 0.08 : 0.04))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(Color.white.opacity(isPreferred ? 0.12 : 0.06), lineWidth: 1)
-            )
-        }
-        .buttonStyle(.plain)
-        .animation(.spring(response: 0.28, dampingFraction: 0.86), value: isPreferred)
-    }
-}
-
-private struct QuickReturnInstructionSheet: View {
-    @Environment(\.dismiss) private var dismiss
-
-    let method: QuickReturnMethod
-    let isPreferred: Bool
-    let onMarkPreferred: () -> Void
-
-    var body: some View {
-        ZStack {
-            MonochromeTheme.background.ignoresSafeArea()
-            MonochromeTheme.ambientGlow.ignoresSafeArea()
-
-            VStack(alignment: .leading, spacing: 18) {
-                HStack(alignment: .top, spacing: 12) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(method.title)
-                            .font(.system(size: 28, weight: .medium, design: .serif))
-                            .foregroundStyle(.white)
-
-                        Text(method.subtitle)
-                            .font(.system(size: 12, weight: .medium, design: .serif))
-                            .foregroundStyle(MonochromeTheme.secondaryText)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    MethodTag(text: method.tagTitle, emphasized: method.isRecommended)
-                }
-
-                Text(method.instruction)
-                    .font(.system(size: 15, weight: .medium, design: .serif))
-                    .foregroundStyle(.white)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Settings Paths")
-                        .font(.system(size: 11, weight: .medium, design: .serif))
-                        .foregroundStyle(MonochromeTheme.tertiaryText)
-
-                    ForEach(method.settingsPaths, id: \.self) { path in
-                        Text(path)
-                            .font(.system(size: 14, weight: .medium, design: .serif))
-                            .foregroundStyle(.white)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-
-                Text("Preferred here means Home will suggest this method when grayscale is off.")
-                    .font(.system(size: 12, weight: .medium, design: .serif))
-                    .foregroundStyle(MonochromeTheme.secondaryText)
-
-                Text("Configuration is not verified by the app.")
-                    .font(.system(size: 12, weight: .medium, design: .serif))
-                    .foregroundStyle(MonochromeTheme.tertiaryText)
-
-                VStack(spacing: 10) {
-                    Button(action: {
-                        onMarkPreferred()
-                        dismiss()
-                    }) {
-                        Text(isPreferred ? "Preferred on Home" : "Mark as Preferred")
-                            .font(.system(size: 14, weight: .semibold, design: .serif))
-                            .foregroundStyle(.black)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .fill(Color.white.opacity(0.92))
-                            )
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(isPreferred)
-                    .opacity(isPreferred ? 0.7 : 1)
-
-                    Button(action: { dismiss() }) {
-                        Text("Done")
-                            .font(.system(size: 14, weight: .medium, design: .serif))
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .fill(Color.white.opacity(0.05))
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .stroke(Color.white.opacity(0.08), lineWidth: 1)
-                            )
-                    }
-                    .buttonStyle(.plain)
-                }
-
-                Spacer(minLength: 0)
-            }
-            .padding(24)
-        }
-    }
-}
-
-private struct MethodTag: View {
-    let text: String
-    let emphasized: Bool
-
-    var body: some View {
-        Text(text)
-            .font(.system(size: 10, weight: .semibold, design: .serif))
-            .foregroundStyle(emphasized ? .black : .white)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(
-                Capsule(style: .continuous)
-                    .fill(emphasized ? Color.white.opacity(0.92) : Color.white.opacity(0.08))
-            )
-            .overlay(
-                Capsule(style: .continuous)
-                    .stroke(Color.white.opacity(emphasized ? 0 : 0.12), lineWidth: 1)
-            )
     }
 }
 

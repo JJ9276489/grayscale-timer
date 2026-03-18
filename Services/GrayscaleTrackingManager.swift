@@ -15,8 +15,12 @@ final class GrayscaleTrackingManager: ObservableObject {
     private let modelContext: ModelContext
     private let userDefaults: UserDefaults
     private var grayscaleObserver: NSObjectProtocol?
+    private var foregroundPollTimer: Timer?
     private var checkpointTimer: Timer?
     private var pendingBreakTimer: Timer?
+    private var pendingBreakAnchor: Date?
+    private var resumeRefreshTimers: [Timer] = []
+    private var lastPublishedWidgetSnapshot: WidgetSnapshot?
 
     private enum DefaultsKey {
         static let lastVerifiedOnTimestamp = "grayscale_last_verified_on_timestamp"
@@ -35,14 +39,19 @@ final class GrayscaleTrackingManager: ObservableObject {
     func handleScenePhaseChange(_ phase: ScenePhase) {
         switch phase {
         case .active:
-            refreshFromSystem()
+            refreshFromSystem(forceWidgetSnapshot: true)
+            startForegroundPolling()
+            scheduleResumeRechecks()
         case .inactive, .background:
+            stopForegroundPolling()
+            invalidateResumeRechecks()
+
             if isGrayscaleEnabled, activeRun != nil {
                 persistVerificationCheckpoint(at: .now)
             }
 
             saveContextIfNeeded()
-            publishWidgetSnapshot(referenceDate: .now)
+            publishWidgetSnapshot(referenceDate: .now, force: true)
         @unknown default:
             break
         }
@@ -63,10 +72,13 @@ final class GrayscaleTrackingManager: ObservableObject {
     private func recoverStateOnLaunch() {
         activeRun = try? fetchActiveRun()
         currentOffStartTime = restoredOffStartTime()
-        refreshFromSystem()
+        refreshFromSystem(forceWidgetSnapshot: true)
     }
 
-    private func refreshFromSystem() {
+    private func refreshFromSystem(forceWidgetSnapshot: Bool = false) {
+        let previousState = isGrayscaleEnabled
+        let previousActiveRunID = activeRun?.id
+        let previousOffStartTime = currentOffStartTime
         let currentState = UIAccessibility.isGrayscaleEnabled
         let now = Date()
 
@@ -87,7 +99,15 @@ final class GrayscaleTrackingManager: ObservableObject {
         }
 
         updateCheckpointTimer()
-        publishWidgetSnapshot(referenceDate: now)
+
+        let stateChanged =
+            previousState != isGrayscaleEnabled ||
+            previousActiveRunID != activeRun?.id ||
+            previousOffStartTime != currentOffStartTime
+
+        if forceWidgetSnapshot || stateChanged {
+            publishWidgetSnapshot(referenceDate: now, force: forceWidgetSnapshot)
+        }
     }
 
     private func beginVerifiedRun(at startTime: Date) {
@@ -130,7 +150,12 @@ final class GrayscaleTrackingManager: ObservableObject {
     }
 
     private func schedulePendingBreak(at offStart: Date, debounceSeconds: TimeInterval) {
+        if pendingBreakAnchor == offStart, pendingBreakTimer != nil {
+            return
+        }
+
         pendingBreakTimer?.invalidate()
+        pendingBreakAnchor = offStart
 
         let remainingInterval = max(0, offStart.addingTimeInterval(debounceSeconds).timeIntervalSinceNow)
 
@@ -149,6 +174,7 @@ final class GrayscaleTrackingManager: ObservableObject {
     private func finalizeBreak(at offStart: Date) {
         pendingBreakTimer?.invalidate()
         pendingBreakTimer = nil
+        pendingBreakAnchor = nil
         endVerifiedRun(at: offStart)
     }
 
@@ -192,7 +218,7 @@ final class GrayscaleTrackingManager: ObservableObject {
         }
     }
 
-    private func publishWidgetSnapshot(referenceDate: Date) {
+    private func publishWidgetSnapshot(referenceDate: Date, force: Bool = false) {
         let runs = (try? fetchAllRuns()) ?? []
         let summaries = (try? fetchAllSummaries()) ?? []
         let goalSettings = GoalSettingsStore.load(userDefaults: userDefaults)
@@ -203,14 +229,41 @@ final class GrayscaleTrackingManager: ObservableObject {
             now: referenceDate,
             goalSettings: goalSettings
         )
+        let today = calendar.startOfDay(for: referenceDate)
+        let todaySnapshot = MetricsService.daySnapshot(
+            for: today,
+            runs: runs,
+            calendar: calendar,
+            now: referenceDate,
+            includeActive: true,
+            goalSettings: goalSettings
+        )
+
+        let lineState: WidgetLineState
+        if isGrayscaleEnabled, activeRun != nil {
+            lineState = todaySnapshot.breakCount > 0 ? .restored : .intact
+        } else {
+            lineState = .breakOpen
+        }
 
         let snapshot = WidgetSnapshot(
             isActive: isGrayscaleEnabled && activeRun != nil,
             activeRunStartTime: activeRun?.startTime,
+            lineState: lineState,
+            isDamaged: todaySnapshot.breakCount > 0,
+            qualifyingProgress: goalSettings.qualifyingProgress(
+                totalVerifiedSeconds: todaySnapshot.totalVerifiedSeconds,
+                grayRate: todaySnapshot.grayRate
+            ),
             currentStreak: MetricsService.currentQualifyingStreak(from: mergedSnapshots, calendar: calendar, today: referenceDate),
             lastUpdated: referenceDate
         )
 
+        if !force, let lastPublishedWidgetSnapshot, snapshot.isMeaningfullyEquivalent(to: lastPublishedWidgetSnapshot) {
+            return
+        }
+
+        lastPublishedWidgetSnapshot = snapshot
         WidgetSnapshotStore.save(snapshot)
         WidgetCenter.shared.reloadTimelines(ofKind: AppConfig.widgetKind)
     }
@@ -228,7 +281,7 @@ final class GrayscaleTrackingManager: ObservableObject {
                 guard let self else { return }
                 let now = Date()
                 self.persistVerificationCheckpoint(at: now)
-                self.publishWidgetSnapshot(referenceDate: now)
+                self.publishWidgetSnapshot(referenceDate: now, force: true)
             }
         }
 
@@ -258,6 +311,7 @@ final class GrayscaleTrackingManager: ObservableObject {
     private func clearOffState() {
         pendingBreakTimer?.invalidate()
         pendingBreakTimer = nil
+        pendingBreakAnchor = nil
         currentOffStartTime = nil
         userDefaults.removeObject(forKey: DefaultsKey.currentOffTimestamp)
     }
@@ -303,6 +357,43 @@ final class GrayscaleTrackingManager: ObservableObject {
     private func saveContextIfNeeded() {
         guard modelContext.hasChanges else { return }
         try? modelContext.save()
+    }
+
+    private func startForegroundPolling() {
+        foregroundPollTimer?.invalidate()
+
+        foregroundPollTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.refreshFromSystem()
+            }
+        }
+
+        foregroundPollTimer?.tolerance = 0.2
+    }
+
+    private func stopForegroundPolling() {
+        foregroundPollTimer?.invalidate()
+        foregroundPollTimer = nil
+    }
+
+    private func scheduleResumeRechecks() {
+        invalidateResumeRechecks()
+
+        for delay in [0.25, 0.8] {
+            let timer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false) { [weak self] _ in
+                Task { @MainActor in
+                    self?.refreshFromSystem(forceWidgetSnapshot: true)
+                }
+            }
+
+            timer.tolerance = 0.1
+            resumeRefreshTimers.append(timer)
+        }
+    }
+
+    private func invalidateResumeRechecks() {
+        resumeRefreshTimers.forEach { $0.invalidate() }
+        resumeRefreshTimers.removeAll()
     }
 }
 

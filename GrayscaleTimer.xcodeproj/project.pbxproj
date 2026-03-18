@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E9E985D1FC227DFA5381A35 /* DayTimelineBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5468AB3FCDC1E0464191764 /* DayTimelineBar.swift */; };
 		1EE72A3DDBA4A0231BB59EBD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8470465872D91DF4B608E001 /* SettingsView.swift */; };
+		2AFF7D350B9B1B14A1D5594A /* LineVisuals.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF089FCA420106E54DF88FEE /* LineVisuals.swift */; };
 		35C62FB82F970E3B0B5C47AB /* MetricsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 346AFF8730091C2DEA2A5BED /* MetricsService.swift */; };
 		421490D37A0CE47EB3BBDDD6 /* SummaryCardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E4A0169F3BB22899519E6D7 /* SummaryCardsView.swift */; };
 		42BDE437C2CE62DC22E0B4FB /* GrayscaleTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8197F44FAB13F214FD3272 /* GrayscaleTrackingManager.swift */; };
@@ -15,6 +17,7 @@
 		466BBD9FFF7FCE530A08F13B /* WidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBFDDF69956D21982B73EB9 /* WidgetSnapshot.swift */; };
 		4F24C6B0789AE7B68F707832 /* InspectViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEE02C88A00CC2449E6C758 /* InspectViews.swift */; };
 		5D99A0FF3E214C80A1671B7B /* GoalSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0198FD14BD5F424364522876 /* GoalSettings.swift */; };
+		609EF8FA9BD51BA7489A9454 /* LineVisuals.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF089FCA420106E54DF88FEE /* LineVisuals.swift */; };
 		63A89C76DF76A4C00C0FDEF4 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B14D3FA8674ED18B8854AEB5 /* HistoryView.swift */; };
 		6C6143989E83E39DF9226796 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17F1D8AE6DA4ACBEC025FFA /* DurationFormatter.swift */; };
 		8145EE202E8D48D97D781F62 /* MonochromeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98972233D135D5F41A9A4FA4 /* MonochromeTheme.swift */; };
@@ -81,6 +84,8 @@
 		CD7D11DE8642954CBC7F4F8E /* Grayscale Timer Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Grayscale Timer Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE0E397D6B284083CA8324BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D17F1D8AE6DA4ACBEC025FFA /* DurationFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationFormatter.swift; sourceTree = "<group>"; };
+		D5468AB3FCDC1E0464191764 /* DayTimelineBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimelineBar.swift; sourceTree = "<group>"; };
+		DF089FCA420106E54DF88FEE /* LineVisuals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineVisuals.swift; sourceTree = "<group>"; };
 		F218E04FE97628333F258AC9 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		F9268BF48C2D62A3628BDD45 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		FAEE02C88A00CC2449E6C758 /* InspectViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspectViews.swift; sourceTree = "<group>"; };
@@ -138,6 +143,7 @@
 		A8070D714C435352892ACAE1 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				D5468AB3FCDC1E0464191764 /* DayTimelineBar.swift */,
 				FAEE02C88A00CC2449E6C758 /* InspectViews.swift */,
 			);
 			path = Shared;
@@ -200,6 +206,7 @@
 				7BDF06BB26D2453B1182B2F8 /* AppConfig.swift */,
 				D17F1D8AE6DA4ACBEC025FFA /* DurationFormatter.swift */,
 				0198FD14BD5F424364522876 /* GoalSettings.swift */,
+				DF089FCA420106E54DF88FEE /* LineVisuals.swift */,
 				98972233D135D5F41A9A4FA4 /* MonochromeTheme.swift */,
 				6BBFDDF69956D21982B73EB9 /* WidgetSnapshot.swift */,
 			);
@@ -279,6 +286,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8A1C518836C52CC4365AB51B /* AppConfig.swift in Sources */,
+				1E9E985D1FC227DFA5381A35 /* DayTimelineBar.swift in Sources */,
 				E40DC404E52173BEF9BD7248 /* DurationFormatter.swift in Sources */,
 				5D99A0FF3E214C80A1671B7B /* GoalSettings.swift in Sources */,
 				D086A65364174B71E8590B2A /* GrayscaleTimerApp.swift in Sources */,
@@ -287,6 +295,7 @@
 				63A89C76DF76A4C00C0FDEF4 /* HistoryView.swift in Sources */,
 				CF86CA6F1577F436CC6EC62E /* HomeView.swift in Sources */,
 				4F24C6B0789AE7B68F707832 /* InspectViews.swift in Sources */,
+				2AFF7D350B9B1B14A1D5594A /* LineVisuals.swift in Sources */,
 				35C62FB82F970E3B0B5C47AB /* MetricsService.swift in Sources */,
 				DE7A10F6380DC16C7072B6F4 /* Models.swift in Sources */,
 				B2BBF16F2623776084F6A6B4 /* MonochromeTheme.swift in Sources */,
@@ -307,6 +316,7 @@
 				6C6143989E83E39DF9226796 /* DurationFormatter.swift in Sources */,
 				871C1791064439A26D10A603 /* GoalSettings.swift in Sources */,
 				B3B376957E6410435CA5B871 /* GrayscaleTimerWidget.swift in Sources */,
+				609EF8FA9BD51BA7489A9454 /* LineVisuals.swift in Sources */,
 				8145EE202E8D48D97D781F62 /* MonochromeTheme.swift in Sources */,
 				466BBD9FFF7FCE530A08F13B /* WidgetSnapshot.swift in Sources */,
 			);

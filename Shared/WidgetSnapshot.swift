@@ -1,17 +1,49 @@
 import Foundation
 
+enum WidgetLineState: String, Codable, Equatable {
+    case intact
+    case restored
+    case breakOpen
+
+    var title: String {
+        switch self {
+        case .intact:
+            return "Line Intact"
+        case .restored:
+            return "Line Restored"
+        case .breakOpen:
+            return "Break Open"
+        }
+    }
+}
+
 struct WidgetSnapshot: Codable, Equatable {
     var isActive: Bool
     var activeRunStartTime: Date?
+    var lineState: WidgetLineState
+    var isDamaged: Bool
+    var qualifyingProgress: Double
     var currentStreak: Int
     var lastUpdated: Date
 
     static let inactive = WidgetSnapshot(
         isActive: false,
         activeRunStartTime: nil,
+        lineState: .breakOpen,
+        isDamaged: true,
+        qualifyingProgress: 0,
         currentStreak: 0,
         lastUpdated: .now
     )
+
+    func isMeaningfullyEquivalent(to other: WidgetSnapshot) -> Bool {
+        isActive == other.isActive &&
+        activeRunStartTime == other.activeRunStartTime &&
+        lineState == other.lineState &&
+        isDamaged == other.isDamaged &&
+        abs(qualifyingProgress - other.qualifyingProgress) < 0.01 &&
+        currentStreak == other.currentStreak
+    }
 }
 
 enum WidgetSnapshotStore {

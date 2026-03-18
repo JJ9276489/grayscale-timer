@@ -28,7 +28,7 @@ Swift bridges them to the names above.
 `GrayscaleTrackingManager` is the single place that touches the UIKit grayscale API.
 
 - On launch it fetches any persisted active run and reconciles it against the current iOS grayscale state.
-- While the app is running, it listens for `UIAccessibility.grayscaleStatusDidChangeNotification`.
+- While the app is running, it listens for `UIAccessibility.grayscaleStatusDidChangeNotification` and also polls `UIAccessibility.isGrayscaleEnabled` once per second while foreground-active to catch missed shortcut toggles.
 - Every verified grayscale `ON` starts a run if one is not already active.
 - Every verified grayscale `OFF` either ends the run immediately or starts a debounce window, depending on Settings.
 - If grayscale returns before the debounce window expires, the run continues without counting a break.
@@ -60,9 +60,9 @@ Both modes are configurable in Settings.
 - Because of that, exact transition timestamps that happen while the process is not running cannot be reconstructed after the fact.
 - The current implementation stores the last verified grayscale checkpoint while active and uses that to avoid inflating verified time when recovery finds grayscale `OFF`.
 - If recovery finds grayscale still `ON` and there is already an active persisted run, the app continues that run to match the requested recovery behavior, but iOS still does not provide historical proof that the state stayed uninterrupted during the time the process was not active.
-- iOS does not provide an official deep link directly to the `Color Filters` page. The app keeps the manual path visible and emphasizes hardware-based quick return methods instead of faking a deeper jump.
+- iOS does not provide an official deep link directly to the `Color Filters` page. The app keeps the manual path visible instead of pretending setup can happen from inside the app.
 - The app does not currently surface a `Gray vs Color Phone Use` split because this build has no reliable public iOS phone-usage/session source in the existing architecture.
-- The widget is intentionally coarse. It uses a shared local snapshot file inside the app-group container plus WidgetKit timeline refreshes. `Text(..., style: .timer)` can feel live, but WidgetKit still decides the actual update cadence.
+- The widget is intentionally coarse. It uses a shared local snapshot file inside the app-group container plus WidgetKit timeline refreshes. `Text(..., style: .timer)` can feel live while a run is active, but WidgetKit still decides the actual update cadence.
 
 ## Project structure
 
@@ -112,8 +112,8 @@ project.yml
 
 The widget reads a local snapshot from the shared app-group container so it can show:
 
-- current run duration when active
-- `Grayscale Off` when inactive
+- current line duration when active
+- `Line Intact`, `Line Restored`, or `Break Open`
 - current streak
 
 If you change bundle identifiers, update the app group string in `project.yml` and the constant in `Shared/AppConfig.swift` together.

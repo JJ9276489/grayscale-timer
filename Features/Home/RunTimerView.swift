@@ -4,9 +4,8 @@ struct RunTimerView: View {
     let activeRun: RunRecord?
     let isGrayscaleActive: Bool
     let currentOffStartTime: Date?
-    let ringProgress: Double
-    let isDamaged: Bool
-    let isPristine: Bool
+    let qualifyingProgress: Double
+    let timeline: DayTimelineSnapshot
     let stateText: String
     let supportingText: String
     let isExpanded: Bool
@@ -17,11 +16,10 @@ struct RunTimerView: View {
     let onLongPress: () -> Void
     let referenceDate: Date
 
-    @State private var animateSurface = false
     @State private var isPressed = false
     @State private var didLongPress = false
 
-    private var displaySeconds: Double {
+    private func displaySeconds(at referenceDate: Date) -> Double {
         if isGrayscaleActive, let activeRun {
             return max(0, referenceDate.timeIntervalSince(activeRun.startTime))
         }
@@ -41,27 +39,26 @@ struct RunTimerView: View {
                     RoundedRectangle(cornerRadius: 34, style: .continuous)
                         .stroke(MonochromeTheme.liveBorder, lineWidth: 1)
                 )
-                .shadow(color: .black.opacity(0.5), radius: 30, x: 0, y: 24)
+                .shadow(color: .black.opacity(0.42), radius: 26, x: 0, y: 20)
 
-            VStack(spacing: 14) {
-                ZStack {
-                    HeroRingView(
-                        progress: ringProgress,
-                        isActive: isGrayscaleActive,
-                        isDamaged: isDamaged,
-                        isPristine: isPristine,
-                        animateSurface: animateSurface,
-                        isPressed: isPressed
-                    )
-                    .frame(width: 292, height: 292)
+            VStack(spacing: 18) {
+                HeroTimelineView(
+                    timeline: timeline,
+                    qualifyingProgress: qualifyingProgress,
+                    isActive: isGrayscaleActive,
+                    isPressed: isPressed
+                )
 
-                    Text(DurationFormatter.clockString(seconds: displaySeconds))
-                        .font(.system(size: 66, weight: .ultraLight, design: .rounded))
+                TimelineView(.periodic(from: referenceDate, by: (isGrayscaleActive || currentOffStartTime != nil) ? 1 : 60)) { context in
+                    let seconds = displaySeconds(at: context.date)
+
+                    Text(DurationFormatter.clockString(seconds: seconds))
+                        .font(.system(size: 70, weight: .ultraLight, design: .rounded))
                         .monospacedDigit()
                         .lineLimit(1)
                         .minimumScaleFactor(0.52)
                         .foregroundStyle(.white)
-                        .contentTransition(.numericText(value: displaySeconds))
+                        .contentTransition(.numericText(value: seconds))
                 }
 
                 Text(stateText)
@@ -88,20 +85,20 @@ struct RunTimerView: View {
                 }
             }
             .padding(.horizontal, 28)
-            .padding(.vertical, 46)
+            .padding(.vertical, 40)
 
             if showsOverlayDetail, let overlayDetail {
                 HeroOverlayPanel(detail: overlayDetail)
-                    .padding(18)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                    .transition(.opacity.combined(with: .scale(scale: 0.96, anchor: .topLeading)))
+                    .padding(.horizontal, 22)
+                    .offset(y: -16)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .transition(.opacity.combined(with: .scale(scale: 0.96, anchor: .top)))
                     .allowsHitTesting(false)
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(minHeight: isExpanded ? 470 : 400)
+        .frame(minHeight: isExpanded ? 410 : 330)
         .scaleEffect(isPressed ? 0.988 : 1)
-        .rotation3DEffect(.degrees(isPressed ? 1.5 : 0), axis: (x: 1, y: 0, z: 0))
         .overlay(
             RoundedRectangle(cornerRadius: 34, style: .continuous)
                 .stroke(Color.white.opacity(isPressed ? 0.2 : 0), lineWidth: 1)
@@ -124,12 +121,6 @@ struct RunTimerView: View {
                 isPressed = pressing
             }
         })
-        .onAppear {
-            guard !animateSurface else { return }
-            withAnimation(.easeInOut(duration: 5.8).repeatForever(autoreverses: true)) {
-                animateSurface = true
-            }
-        }
         .animation(.spring(response: 0.34, dampingFraction: 0.86), value: isExpanded)
         .animation(.spring(response: 0.42, dampingFraction: 0.88), value: isGrayscaleActive)
         .animation(.spring(response: 0.42, dampingFraction: 0.88), value: stateText)
@@ -149,149 +140,44 @@ struct HeroOverlayDetail {
     let footnote: String?
 }
 
-private struct HeroRingView: View {
-    let progress: Double
+private struct HeroTimelineView: View {
+    let timeline: DayTimelineSnapshot
+    let qualifyingProgress: Double
     let isActive: Bool
-    let isDamaged: Bool
-    let isPristine: Bool
-    let animateSurface: Bool
     let isPressed: Bool
 
-    private var clampedProgress: Double {
-        min(max(progress, 0), 1)
-    }
-
     var body: some View {
-        ZStack {
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [
-                            Color.white.opacity(isActive ? 0.14 : 0.06),
-                            Color.white.opacity(0.025),
-                            .clear
-                        ],
-                        center: .center,
-                        startRadius: 12,
-                        endRadius: 172
-                    )
-                )
-                .blur(radius: 16)
-                .scaleEffect(animateSurface ? 1.015 : 0.985)
-                .opacity(isPressed ? 1 : 0.88)
+        VStack(spacing: 14) {
+            DayTimelineBar(
+                timeline: timeline,
+                isActive: isActive,
+                markerOpacity: isActive ? 0.85 : 0.28,
+                trackStrokeOpacity: isActive ? 0.1 : 0.07,
+                showsFractureMarks: false,
+                showsCurrentDot: isActive,
+                style: .hero,
+                labels: DayTimelineLabels(leading: "12A", middle: "12P", trailing: "Now"),
+                markerLabel: nil
+            )
 
-            Circle()
-                .stroke(Color.white.opacity(isActive ? 0.09 : 0.05), style: StrokeStyle(lineWidth: 14, lineCap: .round))
-
-            if clampedProgress > 0.001 {
-                Circle()
-                    .trim(from: 0, to: clampedProgress)
-                    .stroke(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(isActive ? 0.96 : 0.42),
-                                Color.white.opacity(isActive ? 0.28 : 0.16)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottomTrailing
-                        ),
-                        style: StrokeStyle(lineWidth: 14, lineCap: isDamaged ? .butt : .round)
-                    )
-                    .rotationEffect(.degrees(-90))
-                    .shadow(color: .white.opacity(isActive ? 0.14 : 0.04), radius: isActive ? 8 : 2, x: 0, y: 0)
-            }
-
-            if isDamaged {
-                RingScar()
-            }
-
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.white.opacity(coreTopOpacity),
-                            Color.white.opacity(coreMidOpacity),
-                            Color.black.opacity(coreBottomOpacity)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .padding(38)
-                .overlay(
-                    Circle()
-                        .stroke(Color.white.opacity(isActive ? 0.1 : 0.05), lineWidth: 1)
-                        .padding(38)
-                )
-                .overlay {
-                    if !isActive {
-                        Circle()
-                            .fill(Color.black.opacity(0.42))
-                            .padding(76)
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.white.opacity(0.06), lineWidth: 1)
-                                    .padding(76)
-                            )
-                    }
-                }
-                .scaleEffect(isPressed ? 0.985 : 1)
-
-            if isDamaged {
-                CoreScar()
-                    .padding(76)
+            qualifyingRail
+        }
+        .opacity(isActive ? 1 : 0.84)
+        .padding(.top, 2)
+        .overlay(alignment: .top) {
+            if isActive {
+                Capsule(style: .continuous)
+                    .fill(Color.white.opacity(isPressed ? 0.12 : 0.08))
+                    .frame(width: 88, height: 1)
+                    .blur(radius: 0.4)
             }
         }
-        .opacity(isActive ? 1 : 0.86)
     }
 
-    private var coreTopOpacity: Double {
-        if !isActive { return 0.06 }
-        if isPristine { return 0.16 }
-        return 0.12
-    }
-
-    private var coreMidOpacity: Double {
-        if !isActive { return 0.03 }
-        if isPristine { return 0.08 }
-        return 0.05
-    }
-
-    private var coreBottomOpacity: Double {
-        if !isActive { return 0.62 }
-        return isDamaged ? 0.42 : 0.32
-    }
-}
-
-private struct RingScar: View {
-    var body: some View {
-        Circle()
-            .trim(from: 0.12, to: 0.17)
-            .stroke(
-                Color.black.opacity(0.74),
-                style: StrokeStyle(lineWidth: 18, lineCap: .round)
-            )
-            .rotationEffect(.degrees(-90))
-            .overlay(
-                Circle()
-                    .trim(from: 0.119, to: 0.171)
-                    .stroke(Color.white.opacity(0.12), style: StrokeStyle(lineWidth: 1))
-                    .rotationEffect(.degrees(-90))
-            )
-    }
-}
-
-private struct CoreScar: View {
-    var body: some View {
-        RoundedRectangle(cornerRadius: 3, style: .continuous)
-            .fill(Color.black.opacity(0.66))
-            .frame(width: 40, height: 8)
-            .overlay(
-                RoundedRectangle(cornerRadius: 3, style: .continuous)
-                    .stroke(Color.white.opacity(0.09), lineWidth: 1)
-            )
-            .rotationEffect(.degrees(-28))
-            .offset(x: 32, y: -26)
+    private var qualifyingRail: some View {
+        LineProgressRail(progress: qualifyingProgress, isActive: isActive)
+            .frame(width: 126)
+            .opacity(isPressed ? 0.82 : 1)
     }
 }
 
@@ -318,13 +204,13 @@ private struct HeroOverlayPanel: View {
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(Color.white.opacity(0.08))
+                .fill(Color.black.opacity(0.76))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                .stroke(Color.white.opacity(0.12), lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.28), radius: 16, x: 0, y: 12)
+        .shadow(color: .black.opacity(0.34), radius: 18, x: 0, y: 14)
     }
 }
 
@@ -351,11 +237,17 @@ private struct HeroInlineMetric: View {
         activeRun: RunRecord(startTime: .now.addingTimeInterval(-14_400), isActive: true),
         isGrayscaleActive: true,
         currentOffStartTime: nil,
-        ringProgress: 0.78,
-        isDamaged: false,
-        isPristine: true,
+        qualifyingProgress: 0.78,
+        timeline: DayTimelineSnapshot(
+            segments: [
+                DayTimelineSegment(startFraction: 0.14, endFraction: 0.46),
+                DayTimelineSegment(startFraction: 0.58, endFraction: 0.89)
+            ],
+            breakFractions: [0.46],
+            currentFraction: 0.89
+        ),
         stateText: "Line intact",
-        supportingText: "Verified uninterrupted grayscale time",
+        supportingText: "Verified uninterrupted run",
         isExpanded: true,
         expandedDetails: HeroExpandedDetails(
             grayRateText: "78%",
@@ -365,7 +257,7 @@ private struct HeroInlineMetric: View {
         ),
         overlayDetail: HeroOverlayDetail(
             title: "Started 9:03 PM",
-            subtitle: "Perfect still intact",
+            subtitle: "Line still intact",
             footnote: "Verified today 11h 40m"
         ),
         showsOverlayDetail: true,
@@ -383,16 +275,22 @@ private struct HeroInlineMetric: View {
         activeRun: nil,
         isGrayscaleActive: false,
         currentOffStartTime: .now.addingTimeInterval(-2_100),
-        ringProgress: 0.41,
-        isDamaged: true,
-        isPristine: false,
-        stateText: "Out of grayscale",
-        supportingText: "Use Side Button Triple-Click",
+        qualifyingProgress: 0.41,
+        timeline: DayTimelineSnapshot(
+            segments: [
+                DayTimelineSegment(startFraction: 0.18, endFraction: 0.38),
+                DayTimelineSegment(startFraction: 0.52, endFraction: 0.69)
+            ],
+            breakFractions: [0.38, 0.69],
+            currentFraction: 0.87
+        ),
+        stateText: "Break open",
+        supportingText: "Color is live now",
         isExpanded: false,
         expandedDetails: nil,
         overlayDetail: HeroOverlayDetail(
-            title: "Use Side Button Triple-Click",
-            subtitle: "Return now to recover pace.",
+            title: "Break open",
+            subtitle: "Restore the line",
             footnote: "Out since 9:21 PM"
         ),
         showsOverlayDetail: false,

@@ -47,6 +47,13 @@ struct HistoryView: View {
                     includeActive: true,
                     goalSettings: goalSettings
                 )
+                let dayTimeline = MetricsService.dayTimeline(
+                    for: selectedDate,
+                    runs: runs,
+                    calendar: calendar,
+                    now: now,
+                    includeActive: true
+                )
                 let weeklyAggregates = MetricsService.weeklyAggregates(
                     summaries: summaries,
                     runs: runs,
@@ -104,7 +111,7 @@ struct HistoryView: View {
                     .shadow(color: .black.opacity(0.26), radius: 18, x: 0, y: 14)
 
                     ZStack {
-                        DayDetailView(snapshot: daySnapshot, date: selectedDate, goalSettings: goalSettings)
+                        DayDetailView(snapshot: daySnapshot, date: selectedDate, timeline: dayTimeline, goalSettings: goalSettings)
                             .id(daySnapshot.id)
                             .transition(.opacity.combined(with: .scale(scale: 0.985)))
                     }
@@ -190,6 +197,14 @@ private struct WeeklyMetric: View {
             status: .qualifying
         ),
         date: .now,
+        timeline: DayTimelineSnapshot(
+            segments: [
+                DayTimelineSegment(startFraction: 0.12, endFraction: 0.36),
+                DayTimelineSegment(startFraction: 0.43, endFraction: 0.79)
+            ],
+            breakFractions: [0.36],
+            currentFraction: 0.79
+        ),
         goalSettings: GoalSettings.default
     )
     .padding(20)
@@ -214,6 +229,15 @@ private struct WeeklyMetric: View {
             status: .strong
         ),
         date: .now,
+        timeline: DayTimelineSnapshot(
+            segments: [
+                DayTimelineSegment(startFraction: 0.06, endFraction: 0.33),
+                DayTimelineSegment(startFraction: 0.39, endFraction: 0.72),
+                DayTimelineSegment(startFraction: 0.78, endFraction: 0.9)
+            ],
+            breakFractions: [0.33, 0.72],
+            currentFraction: 0.9
+        ),
         goalSettings: GoalSettings.default
     )
     .padding(20)
@@ -238,6 +262,13 @@ private struct WeeklyMetric: View {
             status: .perfect
         ),
         date: .now,
+        timeline: DayTimelineSnapshot(
+            segments: [
+                DayTimelineSegment(startFraction: 0.04, endFraction: 0.93)
+            ],
+            breakFractions: [],
+            currentFraction: 0.93
+        ),
         goalSettings: GoalSettings.default
     )
     .padding(20)
@@ -262,6 +293,15 @@ private struct WeeklyMetric: View {
             status: .missed
         ),
         date: .now,
+        timeline: DayTimelineSnapshot(
+            segments: [
+                DayTimelineSegment(startFraction: 0.12, endFraction: 0.2),
+                DayTimelineSegment(startFraction: 0.37, endFraction: 0.44),
+                DayTimelineSegment(startFraction: 0.7, endFraction: 0.82)
+            ],
+            breakFractions: [0.2, 0.44, 0.82],
+            currentFraction: 0.82
+        ),
         goalSettings: GoalSettings.default
     )
     .padding(20)

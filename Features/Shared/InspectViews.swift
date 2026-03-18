@@ -5,13 +5,12 @@ struct TactileSurfaceButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.985 : 1)
-            .rotation3DEffect(.degrees(configuration.isPressed ? 1.8 : 0), axis: (x: 1, y: 0, z: 0))
+            .scaleEffect(configuration.isPressed ? 0.988 : 1)
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(Color.white.opacity(configuration.isPressed ? 0.05 : 0))
+                    .fill(Color.white.opacity(configuration.isPressed ? 0.04 : 0))
             )
-            .shadow(color: .black.opacity(configuration.isPressed ? 0.34 : 0.22), radius: configuration.isPressed ? 24 : 18, x: 0, y: configuration.isPressed ? 18 : 12)
+            .shadow(color: .black.opacity(configuration.isPressed ? 0.3 : 0.2), radius: configuration.isPressed ? 18 : 14, x: 0, y: configuration.isPressed ? 14 : 10)
             .animation(.spring(response: 0.24, dampingFraction: 0.82), value: configuration.isPressed)
     }
 }
@@ -19,6 +18,7 @@ struct TactileSurfaceButtonStyle: ButtonStyle {
 struct DayDetailView: View {
     let snapshot: DayMetricsSnapshot
     let date: Date
+    let timeline: DayTimelineSnapshot
     let goalSettings: GoalSettings
 
     var body: some View {
@@ -41,7 +41,16 @@ struct DayDetailView: View {
                 }
             }
 
-            ContinuityStrip(snapshot: snapshot)
+            DayTimelineStrip(
+                timeline: timeline,
+                date: date,
+                isPerfect: snapshot.isPerfect,
+                progress: goalSettings.qualifyingProgress(
+                    totalVerifiedSeconds: snapshot.totalVerifiedSeconds,
+                    grayRate: snapshot.grayRate
+                ),
+                isActive: snapshot.totalVerifiedSeconds > 0
+            )
 
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 18), count: 2), alignment: .leading, spacing: 18) {
                 DetailMetric(title: "Gray Rate", value: percentString(snapshot.grayRate))
@@ -73,6 +82,7 @@ struct DayDetailView: View {
 struct DayDetailSheetView: View {
     let snapshot: DayMetricsSnapshot
     let date: Date
+    let timeline: DayTimelineSnapshot
     let goalSettings: GoalSettings
 
     var body: some View {
@@ -81,7 +91,7 @@ struct DayDetailSheetView: View {
             MonochromeTheme.ambientGlow.ignoresSafeArea()
 
             ScrollView {
-                DayDetailView(snapshot: snapshot, date: date, goalSettings: goalSettings)
+                DayDetailView(snapshot: snapshot, date: date, timeline: timeline, goalSettings: goalSettings)
                     .padding(20)
                     .padding(.top, 10)
             }
@@ -108,47 +118,33 @@ struct DetailMetric: View {
     }
 }
 
-struct ContinuityStrip: View {
-    let snapshot: DayMetricsSnapshot
+struct DayTimelineStrip: View {
+    let timeline: DayTimelineSnapshot
+    let date: Date
+    let isPerfect: Bool
+    let progress: Double
+    let isActive: Bool
+    private let calendar = Calendar.autoupdatingCurrent
+
+    private var isToday: Bool {
+        calendar.isDateInToday(date)
+    }
 
     var body: some View {
-        GeometryReader { geometry in
-            let rawFillWidth = geometry.size.width * snapshot.grayRate
-            let fillWidth = snapshot.grayRate > 0 ? max(12, rawFillWidth) : 0
+        VStack(spacing: 12) {
+            DayTimelineBar(
+                timeline: timeline,
+                isActive: isActive,
+                markerOpacity: isToday ? 0.72 : 0.24,
+                trackStrokeOpacity: isPerfect ? 0.14 : 0.08,
+                showsFractureMarks: false,
+                style: .detail,
+                labels: DayTimelineLabels(leading: "12A", middle: "12P", trailing: isToday ? "Now" : "12A")
+            )
 
-            ZStack(alignment: .leading) {
-                Capsule(style: .continuous)
-                    .fill(Color.white.opacity(0.06))
-
-                Capsule(style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.8),
-                                Color.white.opacity(0.22)
-                            ],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .frame(width: fillWidth)
-
-                HStack(spacing: 4) {
-                    ForEach(0..<min(snapshot.breakCount, 6), id: \.self) { _ in
-                        Capsule(style: .continuous)
-                            .fill(Color.black.opacity(0.55))
-                            .frame(width: 3, height: 12)
-                    }
-                }
-                .padding(.leading, 10)
-                .opacity(snapshot.breakCount > 0 ? 1 : 0)
-            }
+            LineProgressRail(progress: progress, isActive: isActive, minimumProgress: 0)
+                .frame(width: 112)
         }
-        .frame(height: 16)
-        .overlay(
-            Capsule(style: .continuous)
-                .stroke(Color.white.opacity(0.08), lineWidth: 1)
-        )
     }
 }
 

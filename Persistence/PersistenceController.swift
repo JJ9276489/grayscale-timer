@@ -10,7 +10,8 @@ final class PersistenceController {
     init(inMemory: Bool = false) {
         let schema = Schema([
             RunRecord.self,
-            DaySummary.self
+            DaySummary.self,
+            UnverifiedInterval.self
         ])
 
         let configuration = ModelConfiguration(
@@ -21,7 +22,17 @@ final class PersistenceController {
         do {
             container = try ModelContainer(for: schema, configurations: [configuration])
         } catch {
-            fatalError("Failed to initialize SwiftData container: \(error)")
+            assertionFailure("Failed to initialize SwiftData container: \(error)")
+
+            do {
+                let fallbackConfiguration = ModelConfiguration(
+                    schema: schema,
+                    isStoredInMemoryOnly: true
+                )
+                container = try ModelContainer(for: schema, configurations: [fallbackConfiguration])
+            } catch {
+                fatalError("Failed to initialize SwiftData container and in-memory fallback: \(error)")
+            }
         }
     }
 }

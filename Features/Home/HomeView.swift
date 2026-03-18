@@ -3,7 +3,6 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject private var trackingManager: GrayscaleTrackingManager
-    @AppStorage(GoalSettingsStore.Key.quickReturnMethod) private var quickReturnMethodRawValue = QuickReturnMethod.accessibilityShortcut.rawValue
     @Query(sort: \RunRecord.startTime, order: .forward) private var runs: [RunRecord]
     @Query(sort: \DaySummary.date, order: .forward) private var summaries: [DaySummary]
 
@@ -14,7 +13,7 @@ struct HomeView: View {
 
     var body: some View {
         ScrollView {
-            TimelineView(.periodic(from: .now, by: trackingManager.activeRun == nil ? 60 : 1)) { timeline in
+            TimelineView(.periodic(from: .now, by: (trackingManager.activeRun != nil || trackingManager.currentOffStartTime != nil) ? 20 : 60)) { timeline in
                 let now = timeline.date
                 let calendar = trackingManager.calendar
                 let goalSettings = GoalSettingsStore.load()
@@ -34,6 +33,13 @@ struct HomeView: View {
                     now: now,
                     goalSettings: goalSettings
                 )
+                let heroTimeline = MetricsService.dayTimeline(
+                    for: today,
+                    runs: runs,
+                    calendar: calendar,
+                    now: now,
+                    includeActive: true
+                )
                 let trendSummary = MetricsService.trendSummary(
                     summaries: summaries,
                     runs: runs,
@@ -49,34 +55,29 @@ struct HomeView: View {
                     isGrayscaleActive: trackingManager.isGrayscaleEnabled,
                     goalSettings: goalSettings
                 )
-                let quickReturnMethod = QuickReturnMethod(rawValue: quickReturnMethodRawValue) ?? .accessibilityShortcut
                 let activeRunAge = trackingManager.activeRun.map { now.timeIntervalSince($0.startTime) } ?? .infinity
                 let dayIsDamaged = todaySnapshot.breakCount > 0
                 let heroStateText: String = {
                     if trackingManager.isGrayscaleEnabled {
-                        if todaySnapshot.perfectIntact {
-                            return "Perfect intact"
-                        }
-
                         if dayIsDamaged {
-                            return "Recovered"
+                            return "Line restored"
                         }
 
                         return "Line intact"
                     }
 
-                    return "Out of grayscale"
+                    return "Break open"
                 }()
                 let heroSupportingText: String = {
                     if trackingManager.isGrayscaleEnabled {
-                        if let latestRecoverySeconds = recoverySummary.latestRecoverySeconds, activeRunAge < 1_800 {
-                            return "Latest recovery \(DurationFormatter.statString(seconds: latestRecoverySeconds))"
+                        if dayIsDamaged, let latestRecoverySeconds = recoverySummary.latestRecoverySeconds, activeRunAge < 1_800 {
+                            return "Restored after \(DurationFormatter.statString(seconds: latestRecoverySeconds))"
                         }
 
                         return "Verified uninterrupted run"
                     }
 
-                    return quickReturnMethod.homePrompt
+                    return "Color is live now"
                 }()
                 let expandedDetails = HeroExpandedDetails(
                     grayRateText: "\(Int((todaySnapshot.grayRate * 100).rounded()))%",
@@ -108,21 +109,21 @@ struct HomeView: View {
                 let heroOverlayDetail = HeroOverlayDetail(
                     title: trackingManager.isGrayscaleEnabled
                         ? (startedText.map { "Started \($0)" } ?? "Run active")
-                        : quickReturnMethod.homePrompt,
+                        : "Break open",
                     subtitle: {
                         if trackingManager.isGrayscaleEnabled {
                             if todaySnapshot.perfectIntact {
-                                return "Perfect still intact"
+                                return "Line still intact"
                             }
 
                             if todaySnapshot.isQualifying {
                                 return "Still qualifies"
                             }
 
-                            return "Below pace"
-                        }
+                        return "Below pace"
+                    }
 
-                        return todayStatus.detail
+                        return "Restore the line"
                     }(),
                     footnote: trackingManager.isGrayscaleEnabled
                         ? "Verified today \(DurationFormatter.statString(seconds: todaySnapshot.totalVerifiedSeconds))"
@@ -134,9 +135,8 @@ struct HomeView: View {
                         activeRun: trackingManager.activeRun,
                         isGrayscaleActive: trackingManager.isGrayscaleEnabled,
                         currentOffStartTime: trackingManager.currentOffStartTime,
-                        ringProgress: ringProgress,
-                        isDamaged: dayIsDamaged,
-                        isPristine: todaySnapshot.perfectIntact,
+                        qualifyingProgress: ringProgress,
+                        timeline: heroTimeline,
                         stateText: heroStateText,
                         supportingText: heroSupportingText,
                         isExpanded: isHeroExpanded,
@@ -162,7 +162,7 @@ struct HomeView: View {
                 .padding(.top, 14)
                 .padding(.bottom, 30)
                 .sheet(isPresented: $showTodayDetailSheet) {
-                    DayDetailSheetView(snapshot: todaySnapshot, date: today, goalSettings: goalSettings)
+                    DayDetailSheetView(snapshot: todaySnapshot, date: today, timeline: heroTimeline, goalSettings: goalSettings)
                         .presentationDetents([.medium, .large])
                         .presentationDragIndicator(.visible)
                 }

@@ -46,121 +46,6 @@ enum BreakDebounceOption: Double, CaseIterable, Identifiable {
     }
 }
 
-enum QuickReturnMethod: String, CaseIterable, Identifiable {
-    case accessibilityShortcut
-    case actionButton
-    case backTap
-    case controlCenter
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .accessibilityShortcut:
-            return "Accessibility Shortcut"
-        case .actionButton:
-            return "Action Button"
-        case .backTap:
-            return "Back Tap"
-        case .controlCenter:
-            return "Control Center"
-        }
-    }
-
-    var tagTitle: String {
-        switch self {
-        case .accessibilityShortcut:
-            return "Best"
-        case .actionButton:
-            return "Fast if supported"
-        case .backTap:
-            return "Convenient"
-        case .controlCenter:
-            return "Fallback"
-        }
-    }
-
-    var subtitle: String {
-        switch self {
-        case .accessibilityShortcut:
-            return "Best overall for most users."
-        case .actionButton:
-            return "Fast on supported iPhones."
-        case .backTap:
-            return "Convenient if you prefer a gesture."
-        case .controlCenter:
-            return "Reliable when hardware controls are occupied."
-        }
-    }
-
-    var summary: String {
-        switch self {
-        case .accessibilityShortcut:
-            return "One hardware gesture back to grayscale."
-        case .actionButton:
-            return "A dedicated hardware press for recovery."
-        case .backTap:
-            return "A quick device gesture when buttons are busy."
-        case .controlCenter:
-            return "Universal fallback without special hardware."
-        }
-    }
-
-    var instruction: String {
-        switch self {
-        case .accessibilityShortcut:
-            return "Assign Color Filters to Side Button Triple-Click."
-        case .actionButton:
-            return "Set the Action Button to Accessibility Shortcut, then include Color Filters."
-        case .backTap:
-            return "Map Double Tap or Triple Tap to Accessibility Shortcut."
-        case .controlCenter:
-            return "Add Accessibility Shortcuts to Control Center for quick recovery."
-        }
-    }
-
-    var settingsPaths: [String] {
-        switch self {
-        case .accessibilityShortcut:
-            return [
-                "Settings → Accessibility → Accessibility Shortcut → Color Filters"
-            ]
-        case .actionButton:
-            return [
-                "Settings → Action Button → Accessibility Shortcut",
-                "Then: Settings → Accessibility → Accessibility Shortcut → Color Filters"
-            ]
-        case .backTap:
-            return [
-                "Settings → Accessibility → Touch → Back Tap → Accessibility Shortcut",
-                "Then: Settings → Accessibility → Accessibility Shortcut → Color Filters"
-            ]
-        case .controlCenter:
-            return [
-                "Settings → Control Center → add Accessibility Shortcuts",
-                "Then ensure Accessibility Shortcuts includes Color Filters"
-            ]
-        }
-    }
-
-    var homePrompt: String {
-        switch self {
-        case .accessibilityShortcut:
-            return "Use Side Button Triple-Click"
-        case .actionButton:
-            return "Use Action Button"
-        case .backTap:
-            return "Use Back Tap"
-        case .controlCenter:
-            return "Open Control Center"
-        }
-    }
-
-    var isRecommended: Bool {
-        self == .accessibilityShortcut
-    }
-}
-
 struct GoalSettings: Equatable, Hashable {
     var mode: GoalMode
     var qualifyingRate: Double
@@ -224,7 +109,6 @@ enum GoalSettingsStore {
         static let fixedStrongHours = "goal_fixed_strong_hours"
         static let perfectRequiresQualification = "goal_perfect_requires_qualification"
         static let breakDebounceSeconds = "goal_break_debounce_seconds"
-        static let quickReturnMethod = "goal_quick_return_method"
     }
 
     static func load(userDefaults: UserDefaults = .standard) -> GoalSettings {

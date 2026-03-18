@@ -54,6 +54,23 @@ struct DayMetricsSnapshot: Hashable, Identifiable {
     }
 }
 
+struct DayTimelineSegment: Hashable, Identifiable {
+    let startFraction: Double
+    let endFraction: Double
+
+    var id: String {
+        "\(startFraction)-\(endFraction)"
+    }
+}
+
+struct DayTimelineSnapshot: Hashable {
+    let segments: [DayTimelineSegment]
+    let breakFractions: [Double]
+    let currentFraction: Double
+
+    static let empty = DayTimelineSnapshot(segments: [], breakFractions: [], currentFraction: 0)
+}
+
 struct HeatmapDay: Hashable, Identifiable {
     let date: Date
     let snapshot: DayMetricsSnapshot
@@ -204,6 +221,57 @@ enum MetricsService {
             isPerfect: isPerfect,
             perfectIntact: perfectIntact,
             status: status
+        )
+    }
+
+    static func dayTimeline(
+        for dayStart: Date,
+        runs: [RunRecord],
+        calendar: Calendar,
+        now: Date = .now,
+        includeActive: Bool = true
+    ) -> DayTimelineSnapshot {
+        let normalizedDayStart = calendar.startOfDay(for: dayStart)
+        guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: normalizedDayStart) else {
+            return .empty
+        }
+
+        let measurementEnd = boundedMeasurementEnd(
+            dayStart: normalizedDayStart,
+            dayEnd: dayEnd,
+            now: now
+        )
+        let fullDaySeconds = max(dayEnd.timeIntervalSince(normalizedDayStart), 1)
+
+        let segments = runs.compactMap { run -> DayTimelineSegment? in
+            guard let effectiveEnd = effectiveEnd(for: run, now: now, includeActive: includeActive) else {
+                return nil
+            }
+            guard run.startTime < measurementEnd, effectiveEnd > normalizedDayStart else {
+                return nil
+            }
+
+            let overlapStart = max(run.startTime, normalizedDayStart)
+            let overlapEnd = min(effectiveEnd, measurementEnd)
+            guard overlapEnd > overlapStart else { return nil }
+
+            return DayTimelineSegment(
+                startFraction: max(0, min(overlapStart.timeIntervalSince(normalizedDayStart) / fullDaySeconds, 1)),
+                endFraction: max(0, min(overlapEnd.timeIntervalSince(normalizedDayStart) / fullDaySeconds, 1))
+            )
+        }
+
+        let breakFractions = runs.compactMap { run -> Double? in
+            guard !run.isActive, let endTime = run.endTime else { return nil }
+            guard endTime >= normalizedDayStart, endTime <= measurementEnd else { return nil }
+
+            return max(0, min(endTime.timeIntervalSince(normalizedDayStart) / fullDaySeconds, 1))
+        }
+
+        return DayTimelineSnapshot(
+            segments: segments.sorted { $0.startFraction < $1.startFraction },
+            breakFractions: breakFractions.sorted(),
+            currentFraction: max(0, min(measurementEnd.timeIntervalSince(normalizedDayStart) / fullDaySeconds, 1))
         )
     }
 
